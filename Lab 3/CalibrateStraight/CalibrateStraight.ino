@@ -1,4 +1,5 @@
-// left should be 209, right should be 248
+// left should be 245, right should be 128
+//our motors have very different speeds
 
 #include <EEPROM.h>
 
@@ -20,16 +21,15 @@ void AdjustSpeeds(){
     delay(500);
   }
   if((!digitalRead(Lbumper)) && (digitalRead(Rbumper))){
-    left_speed --;
+    //left_speed --;
     right_speed = right_speed + 4;
   }else if((digitalRead(Lbumper)) && (!digitalRead(Rbumper))){
     left_speed = left_speed +4;
-    right_speed--;
+    //right_speed--;
   }else if(((!digitalRead(Lbumper)) && (!digitalRead(Rbumper)))){
      EEPROM.write(0, left_speed);
      EEPROM.write(1, right_speed);
      Serial.println("SAVED!!");
-     right_speed = left_speed = 0;
      delay(100);
      return;                //means we're going straight
   }
