@@ -2,17 +2,17 @@
 
 
 //----------------------------------DIGITAL PINS
-#define sensorIR  2
-#define startButton    3
-#define Lbumper   4
-#define Rbumper     5
-#define Lspeed      6
-#define Ldirection 7
-#define Rspeed 8
-#define Rdirection 9
-#define wheelEncoder 10
+#define sensorIR            2
+#define startButton         3
+#define Lbumper             4
+#define Rbumper             5
+#define Lspeed              6
+#define Ldirection          7
+#define Rspeed              8
+#define Rdirection          9
+#define wheelEncoder        10
 
-Servo pan, tilt, grip
+Servo pan, tilt, grip   //pins 11, 12, 13
 
 //----------------------------------ANALOG PINS
 #define forceBall   0
@@ -47,7 +47,7 @@ void Backup(){
     analogWrite(Rspeed, right_speed);
 }
 
-void Pivot(char direction, int degrees){      //pivot function
+void Pivot(char direction, int degrees){             //pivot function
   int counter = 0;
   if(direction == 'L'){                     //left rotation
     if(degrees == 45){
@@ -100,6 +100,55 @@ void Pivot(char direction, int degrees){      //pivot function
 
 //----------------------------------HARD FUNCTIONS
 
+int identifyStartingPosition(){
+
+
+
+}
+
+void followLine(){
+
+
+
+
+}
+
+void detectIntersection(){
+
+
+
+
+}
+
+void determineBall(){
+
+
+}
+
+void grabBall(){
+
+
+
+}
+
+void depositBall(){
+
+
+
+}
+
+void collisionDetection(){
+
+
+
+}
+
+void bluetoothReset(){
+
+
+
+
+}
 
 
 
@@ -107,7 +156,8 @@ void Pivot(char direction, int degrees){      //pivot function
 //----------------------------------SETUP
 void setup(){
   Serial.begin(9600);
-  pinMode(button,INPUT);
+  pinMode(sensorIR, INPUT);
+  pinMode(startButton,INPUT);
   pinMode(Lbumper,INPUT);
   pinMode(Rbumper,INPUT);
   pinMode(Lspeed,OUTPUT);
@@ -115,7 +165,11 @@ void setup(){
   pinMode(Rspeed, OUTPUT);
   pinMode(Rdirection,OUTPUT);
   pinMode(Lencoder,INPUT);
-  pinMode(Rencoder,INPUT);
+ 
+  pan.attach(11);
+  tilt.attach(12);
+  grip.attach(13);
+  
 
   left_speed = EEPROM.read(0);
   right_speed = EEPROM.read(1);
