@@ -94,7 +94,7 @@ void detectIntersection(){
 
 }
 
-void determineBall(){
+void depositBall(){
 
 
 }
