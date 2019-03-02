@@ -1,4 +1,4 @@
-//--------------------------------------------SUPER BASIC FUNCTIONS
+//--------------------------------------------BASIC FUNCTIONS
 void forward(){
     digitalWrite(Ldirection, HIGH);
     digitalWrite(Rdirection, HIGH);
@@ -72,25 +72,34 @@ void pivot(char direction, int degrees){             //pivot function
 }
 
 
-//----------------------------------HARD FUNCTIONS
+//----------------------------------COMPLEX FUNCTIONS
 
 int identifyStartingPosition(){
-    int val = IRserial.receive(200);
-    switch(val){
-        case left:
-            
-        case center:
-            
-        case right:
-            
-        
-        
-        
+    int position = 0;
+    Serial.print("Position: ");
+
+    while(position == 0){
+      int val = IRserial.receive(200);
+      
+      switch(char(val)){
+          case 'L':
+            Serial.println("Left");
+            position = 1;
+            break;
+          case 'C':
+            Serial.println("Center");
+            position = 2;
+            break;
+          case 'R':
+            Serial.println("Right");
+            position = 3;
+            break;
+      }
+      delay(100);
     }
-    
-
-
+    return position;
 }
+
 
 void followLine(){
 
@@ -106,10 +115,67 @@ void detectIntersection(){
 
 }
 
-void depositBall(){
-
-
+void pos(int x, int y){
+    
+    
+    
+    
 }
+
+
+void getBall(int ballNum){
+  switch(ballNum){            //there are 15 balls in this competition, this is getting the coordinates for the balls
+    case 1:
+      pos(0,1);       //not sure yet what the position is of each ball
+      break;
+    case 2:
+
+      break;
+    case 3:
+
+      break;
+    case 4:
+
+      break;
+    case 5:
+
+      break;
+    case 6:
+
+      break;
+    case 7:
+
+      break;
+    case 8:
+
+      break;
+    case 9:
+
+      break;
+    case 10:
+
+      break;
+    case 11:
+
+      break;
+    case 12:
+
+      break;
+    case 13:
+
+      break;
+    case 14:
+
+      break;
+    case 15:
+
+      break;
+    default:
+      Serial.println("Invalid ball number");
+      break; 
+  }
+}
+
 
 void grabBall(){
 
@@ -129,9 +195,30 @@ void collisionDetection(){
 
 }
 
-void bluetoothReset(){
+void bluetoothEmergency(){
+  //for EPBMX, the serial.begin must be changed to "115200"
 
-
-
-
+  while(Serial.available() && (completion == 0)){         //completion goes to 1 when a task is completed
+    int code = Serial.read();
+    Serial.print("BT Number Recieved: ");
+    Serial.println(code);
+    
+    switch(code){
+      case ##:            //make the robot go back to home base
+        Serial.println("Going back to home base");
+        position(0,0);
+        Serial.println("Now at home base");
+        completion++;
+        break;
+      case ##:            //go to deposit ball
+        position(3,-1);     //the position of the bin
+        depositBall();
+        completion++;
+        break;
+    }
+  }
+  completion = 0;
+  if(!Serial.available()){
+    Serial.println("Serial is unavailable");
+  }
 }
