@@ -24,6 +24,9 @@ Servo pan, tilt, grip   //pins 11, 12, 13
 #define lineR               3
 #define range               4
 
+  
+int ballData[15] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};   //the corresponding zero to ball# will change once completed
+  
 byte left_speed;                    //speed store on each robot for going straight
 byte right_speed;
 
