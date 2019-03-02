@@ -1,6 +1,5 @@
 #include <EEPROM.h>
 
-
 //----------------------------------DIGITAL PINS
 #define sensorIR            2
 #define startButton         3
@@ -15,17 +14,17 @@
 Servo pan, tilt, grip   //pins 11, 12, 13
 
 //----------------------------------ANALOG PINS
-#define forceBall   0
-#define lineL       1
-#define lineC       2
-#define lineR       3
-#define range       4
+#define forceBall           0
+#define lineL               1
+#define lineC               2
+#define lineR               3
+#define range               4
 
 byte left_speed;                    //speed store on each robot for going straight
 byte right_speed;
 
 //--------------------------------------------SUPER BASIC FUNCTIONS
-void Forward(){
+void forward(){
     digitalWrite(Ldirection, HIGH);
     digitalWrite(Rdirection, HIGH);
     analogWrite(Lspeed, left_speed);
@@ -33,21 +32,21 @@ void Forward(){
 }
 
 
-void Stop(){
+void stop(){
     digitalWrite(Ldirection, HIGH);
     digitalWrite(Rdirection, HIGH);
     analogWrite(Lspeed, 0);
     analogWrite(Rspeed, 0);
 }
 
-void Backup(){
+void backup(){
     digitalWrite(Ldirection, LOW);
     digitalWrite(Rdirection, LOW);
     analogWrite(Lspeed, left_speed);
     analogWrite(Rspeed, right_speed);
 }
 
-void Pivot(char direction, int degrees){             //pivot function
+void pivot(char direction, int degrees){             //pivot function
   int counter = 0;
   if(direction == 'L'){                     //left rotation
     if(degrees == 45){
