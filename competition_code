@@ -1,34 +1,37 @@
 #include <EEPROM.h>
 
+
+//----------------------------------DIGITAL PINS
 #define sensorIR  2
-#define button    3
+#define startButton    3
 #define Lbumper   4
 #define Rbumper     5
 #define Lspeed      6
 #define Ldirection 7
 #define Rspeed 8
 #define Rdirection 9
-#define Lencoder 10
-#define Rencoder 11
+#define wheelEncoder 10
 
-byte left_speed;
+Servo pan, tilt, grip
+
+//----------------------------------ANALOG PINS
+#define forceBall   0
+#define lineL       1
+#define lineC       2
+#define lineR       3
+#define range       4
+
+byte left_speed;                    //speed store on each robot for going straight
 byte right_speed;
 
-void WaitButton(){
-  if(!digitalRead(button)){
-    Serial.println("Start button pressed");
-    return;
-  }else{
-    WaitButton();
-  }
-}
-
+//--------------------------------------------SUPER BASIC FUNCTIONS
 void Forward(){
     digitalWrite(Ldirection, HIGH);
     digitalWrite(Rdirection, HIGH);
     analogWrite(Lspeed, left_speed);
     analogWrite(Rspeed, right_speed);
 }
+
 
 void Stop(){
     digitalWrite(Ldirection, HIGH);
@@ -94,33 +97,14 @@ void Pivot(char direction, int degrees){      //pivot function
   }
 }
 
-void ReactBumpers(){
-  if(!digitalRead(Lbumper)){
-    delay(500);
-    if(!digitalRead(Rbumper)){
-      Backup();
-      delay(500);
-      Pivot('E',180);
-    }else{
-       Backup();
-       delay(700);
-       Pivot('R',45);
-    }
-  }else if(!digitalRead(Rbumper)){
-    delay(500);
-    if(!digitalRead(Lbumper)){
-      Backup();
-      delay(500);
-      Pivot('E',180);
-    }else{
-       Backup();
-       delay(700);
-       Pivot('L',45);
-    }
-  }
-}
+
+//----------------------------------HARD FUNCTIONS
 
 
+
+
+
+//----------------------------------SETUP
 void setup(){
   Serial.begin(9600);
   pinMode(button,INPUT);
@@ -136,10 +120,13 @@ void setup(){
   left_speed = EEPROM.read(0);
   right_speed = EEPROM.read(1);
  
-  WaitButton();                 //initial button to turn it on
 }
 
+
+//----------------------------------LOOP
 void loop(){
-  Forward();
-  ReactBumpers();
+
+
+
+
 }
