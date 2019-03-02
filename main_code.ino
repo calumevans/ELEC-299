@@ -1,4 +1,5 @@
 #include <EEPROM.h>
+#include <functions.h'>
 
 //----------------------------------DIGITAL PINS
 #define sensorIR            2
