@@ -14,7 +14,7 @@ void stop(){
     analogWrite(Rspeed, 0);
 }
 
-void backup(){
+void backwards(){
     digitalWrite(Ldirection, LOW);
     digitalWrite(Rdirection, LOW);
     analogWrite(Lspeed, left_speed);
@@ -75,7 +75,19 @@ void pivot(char direction, int degrees){             //pivot function
 //----------------------------------HARD FUNCTIONS
 
 int identifyStartingPosition(){
-
+    int val = IRserial.receive(200);
+    switch(val){
+        case left:
+            
+        case center:
+            
+        case right:
+            
+        
+        
+        
+    }
+    
 
 
 }
