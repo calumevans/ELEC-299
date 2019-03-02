@@ -1,5 +1,8 @@
 #include <EEPROM.h>
 #include <functions.h'>
+#include <QSerial.h>
+
+QSerial IRserial;
 
 //----------------------------------DIGITAL PINS
 #define sensorIR            2
@@ -29,7 +32,9 @@ byte right_speed;
 //----------------------------------SETUP
 void setup(){
   Serial.begin(9600);
-  pinMode(sensorIR, INPUT);
+  
+  IRserial.attach(7,-1);
+  
   pinMode(startButton,INPUT);
   pinMode(Lbumper,INPUT);
   pinMode(Rbumper,INPUT);
