@@ -124,56 +124,61 @@ void pos(int x, int y){
 
 
 void getBall(int ballNum){
-  switch(ballNum){            //there are 15 balls in this competition, this is getting the coordinates for the balls
+  Serial.print("Ball #");
+  Serial.print(ballNum);
+  Serial.println(" is being captured");
+  
+  switch(ballNum){            //there are 15 balls in this competition, this is getting the coordinates for the balls and using pos() to travel
     case 1:
-      pos(0,1);       //not sure yet what the position is of each ball
+      pos(0,1);
       break;
     case 2:
-
+        pos(0,2);
       break;
     case 3:
-
+        pos(0,3);
       break;
     case 4:
-
+        pos(0,4);
       break;
     case 5:
-
+        pos(0,5);
       break;
     case 6:
-
+        pos(1,6);
       break;
     case 7:
-
+        pos(2,6);
       break;
     case 8:
-
+        pos(3,6);
       break;
     case 9:
-
+        pos(4,6);
       break;
     case 10:
-
+        pos(5,6);
       break;
     case 11:
-
+        pos(6,5);
       break;
     case 12:
-
+        pos(6,4);
       break;
     case 13:
-
+        pos(6,3);
       break;
     case 14:
-
+        pos(6,2);
       break;
     case 15:
-
+        pos(6,1);
       break;
     default:
       Serial.println("Invalid ball number");
       break; 
   }
+ballData[ballNum-1] = 1;          //updates the array to show each ball that is captured (denoted with a 1)
 }
 
 
@@ -206,12 +211,12 @@ void bluetoothEmergency(){
     switch(code){
       case ##:            //make the robot go back to home base
         Serial.println("Going back to home base");
-        position(0,0);
+        pos(0,0);
         Serial.println("Now at home base");
         completion++;
         break;
       case ##:            //go to deposit ball
-        position(3,-1);     //the position of the bin
+        pos(3,-1);     //the position of the bin
         depositBall();
         completion++;
         break;
