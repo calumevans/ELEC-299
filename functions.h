@@ -8,8 +8,6 @@ void forward(){
 
 
 void stop(){
-    digitalWrite(Ldirection, HIGH);
-    digitalWrite(Rdirection, HIGH);
     analogWrite(Lspeed, 0);
     analogWrite(Rspeed, 0);
 }
@@ -23,39 +21,40 @@ void backwards(){
 
 void pivot(char direction, int degrees){             //pivot function
   int counter = 0;
-  if(direction == 'L'){                     //left rotation
-    if(degrees == 45){
-      while(counter < 20){
-      digitalWrite(Ldirection, LOW);
-      digitalWrite(Rdirection, HIGH);
-      analogWrite(Lspeed, 140);
-      analogWrite(Rspeed, 140);
+  switch(degrees){
+      case 45:                     //left rotation
+        if(direction == 'L'){
+          while(counter < 20){
+          digitalWrite(Ldirection, LOW);
+          digitalWrite(Rdirection, HIGH);
+          analogWrite(Lspeed, 140);
+          analogWrite(Rspeed, 140);
   
-      int LwheelVal = digitalRead(Lencoder);
-      counter = counter + LwheelVal;
-      Serial.print("Counter: ");
-      Serial.println(counter);
+          int LwheelVal = digitalRead(Lencoder);
+          counter = counter + LwheelVal;
+          Serial.print("Counter: ");
+          Serial.println(counter);
+          }
+        counter = 0;
+            
+      }else if(direction == 'R'){        //right rotation
+          while(counter < 20){
+          digitalWrite(Ldirection, HIGH);
+          digitalWrite(Rdirection, LOW);
+          analogWrite(Lspeed, 140);
+          analogWrite(Rspeed, 140);
+
+          int LwheelVal = digitalRead(Lencoder);
+          counter = counter + LwheelVal;
+          Serial.print("Counter: ");
+          Serial.println(counter);
+          }
+          counter = 0;
+      }else{
+          Serial.println("Invalid direction"); 
       }
-      counter = 0;
-    }
-    
-  }else if(direction == 'R'){           //right rotation
-    if(degrees == 45){
-      while(counter < 20){
-      digitalWrite(Ldirection, HIGH);
-      digitalWrite(Rdirection, LOW);
-      analogWrite(Lspeed, 140);
-      analogWrite(Rspeed, 140);
-  
-      int LwheelVal = digitalRead(Lencoder);
-      counter = counter + LwheelVal;
-      Serial.print("Counter: ");
-      Serial.println(counter);
-      }
-      counter = 0;
-    }  
-  }else if(direction == 'E'){
-    if(degrees == 180){
+      break;
+    case 180:
       while(counter < 35){
         digitalWrite(Ldirection, HIGH);
         digitalWrite(Rdirection, LOW);
@@ -67,7 +66,7 @@ void pivot(char direction, int degrees){             //pivot function
         Serial.print("Counter: ");
         Serial.println(counter);
       }
-    }
+      break;
   }
 }
 
