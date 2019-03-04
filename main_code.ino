@@ -26,6 +26,7 @@ Servo pan, tilt, grip   //pins 11, 12, 13
 
   
 int ballData[15] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};   //the corresponding zero to ball# will change once completed
+#define THRESH 800
   
 byte left_speed;                    //speed store on each robot for going straight
 byte right_speed;
