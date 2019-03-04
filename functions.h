@@ -109,11 +109,11 @@ void followLine(){
 
 int detectIntersection(){                   //I think this will work? It return a single 1 when all three sensors sense black
     while(1){
-        Serial.print(valueL);           //just printing the sensor values for seeing what threshholds we need
+        Serial.print(lineL);           //just printing the sensor values for seeing what threshholds we need
         Serial.print(", ");
-        Serial.print(valueC);
+        Serial.print(lineC);
         Serial.print(", ");
-        Serial.println(valueR);
+        Serial.println(lineR);
         if((analogRead(lineL) > THRESH) && (analogRead(lineC) > THRESH) && (analogRead(lineR) > THRESH)){
             Serial.println("Intersection detected!");
             break;
