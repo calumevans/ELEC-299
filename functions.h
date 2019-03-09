@@ -101,7 +101,33 @@ int identifyStartingPosition(){
 
 
 void followLine(){
+int val1 = analogRead(A0);
+ int val2 = analogRead(A1);
+ int val3 = analogRead(A2);
 
+ Serial.println("Value 1:");
+ Serial.println(val1);
+ Serial.println("Value 2:");
+ Serial.println(val2);
+ Serial.println("Value 3:");
+ Serial.println(val3);
+ 
+
+if (val3>LTHRESH){
+   analogWrite(spdR, 100);
+   analogWrite(spdL, 0);
+  }
+  else if(val2>RTHRESH){
+    analogWrite(spdL, 100);
+   analogWrite(spdR, 0);
+  }
+  else if(val1>CTHRESH){
+   analogWrite(spdL, 100);
+   analogWrite(spdR, 100);
+  }
+
+
+}
 
 
 
