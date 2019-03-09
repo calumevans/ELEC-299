@@ -217,6 +217,43 @@ ballData[ballNum-1] = 1;          //updates the array to show each ball that is 
 
 void grabBall(){
 
+#include <Servo.h>
+Servo myservo1, myservo2, myservo3;
+
+int gripperPad = A5;
+
+int grip = 0;
+int angle = 0;
+
+void setup() {
+  // put your setup code here, to run once:
+  
+   myservo1.attach(11);
+   myservo2.attach(12);
+   myservo3.attach(13);
+  
+  Serial.begin(9600);
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  angle = 0 ;
+  myservo1.write(angle);
+  grip = analogRead (gripperPad);
+
+  while(grip < 500){
+    grip = analogRead (gripperPad);
+    angle++;
+    myservo1.write(angle);
+    Serial.println(String(grip));
+    delay(100);
+    
+  }  
+    
+  Serial.println(String(grip));
+
+  }
 
 
 }
