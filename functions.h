@@ -19,6 +19,17 @@ void backwards(){
     analogWrite(Rspeed, right_speed);
 }
 
+void CheckDistance(){
+  delay(500);
+  if(analogRead(IRrange) < THRESHHOLD){
+    Forward();
+  }else if(analogRead(IRrange) >= THRESHHOLD){
+    Stop();
+    delay(300);
+    Forward();
+  } 
+}
+
 void pivot(char direction, int degrees){             //pivot function
   int counter = 0;
   switch(degrees){
