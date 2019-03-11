@@ -63,7 +63,7 @@ void pivot(char direction, int degrees){            //pivot function
   switch (degrees){
     case 90:                     //left rotation
       if (direction == 'L'){
-        while (counter < 20){
+        while (counter < 25){
           digitalWrite(Ldirection, LOW);
           digitalWrite(Rdirection, HIGH);
           analogWrite(Lspeed, left_speed);
@@ -77,7 +77,7 @@ void pivot(char direction, int degrees){            //pivot function
         counter = 0;
 
       } else if (direction == 'R'){      //right rotation
-        while (counter < 20) {
+        while (counter < 25) {
           digitalWrite(Ldirection, HIGH);
           digitalWrite(Rdirection, LOW);
           analogWrite(Lspeed, left_speed);
@@ -94,7 +94,7 @@ void pivot(char direction, int degrees){            //pivot function
       }
       break;
     case 180:
-      while (counter < 35){
+      while (counter < 40){
         digitalWrite(Ldirection, HIGH);
         digitalWrite(Rdirection, LOW);
         analogWrite(Lspeed, left_speed);
@@ -112,17 +112,13 @@ void pivot(char direction, int degrees){            //pivot function
 
 //----------------------------------COMPLEX FUNCTIONS
 void grabBall(){
-  int angle = 0 ;
-  grip.write(angle);
-  int force = analogRead(forceBall);
-
-  while(analogRead(forceBall) < 500){
-    angle++;
-    grip.write(angle);
-    Serial.println(analogRead(forceBall));
+  tilt.write(60);
+  for(int i=90;i<166;i++){
+    Serial.println(i);
+    grip.write(i);
     delay(50);
   }
-  delay(4000);
+  delay(10000);
 }
 
 
@@ -216,7 +212,7 @@ void setup() {
 
   left_speed = 100;               //temporary for troubleshooting
   right_speed = 100;
-  // left_speed = EEPROM.read(0); //this is how it should be
+ // left_speed = EEPROM.read(0); //this is how it should be
   //right_speed = EEPROM.read(1);
 }
 
@@ -224,12 +220,14 @@ void setup() {
 //----------------------------------LOOP
 void loop() {
 
-  // line stuff that works
+  /* line stuff that works
   int distance = followLine();
   if(distance == 1){
     pivot('R',90);
     distance = 0;
   }
-  //grabBall();
+  */
+  grabBall();
+  
   
 }
