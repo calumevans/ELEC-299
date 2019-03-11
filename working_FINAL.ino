@@ -44,11 +44,14 @@ void forward(){
   digitalWrite(Rdirection, HIGH);
   analogWrite(Lspeed, left_speed);
   analogWrite(Rspeed, right_speed);
+  Serial.println("Forward");
 }
 
 void stopped(){
   analogWrite(Lspeed, 0);
   analogWrite(Rspeed, 0);
+    Serial.println("Stopped");
+
 }
 
 void backwards(){
@@ -56,6 +59,8 @@ void backwards(){
   digitalWrite(Rdirection, LOW);
   analogWrite(Lspeed, left_speed);
   analogWrite(Rspeed, right_speed);
+  Serial.println("Backwards");
+
 }
 
 void pivot(char direction, int degrees){            //pivot function
@@ -94,7 +99,7 @@ void pivot(char direction, int degrees){            //pivot function
       }
       break;
     case 180:
-      while (counter < 40){
+      while (counter < 145){
         digitalWrite(Ldirection, HIGH);
         digitalWrite(Rdirection, LOW);
         analogWrite(Lspeed, left_speed);
@@ -112,13 +117,27 @@ void pivot(char direction, int degrees){            //pivot function
 
 //----------------------------------COMPLEX FUNCTIONS
 void grabBall(){
-  tilt.write(60);
+  stopped();
+  tilt.write(46);
   for(int i=90;i<166;i++){
     Serial.println(i);
     grip.write(i);
     delay(50);
   }
-  delay(10000);
+  delay(4000);
+}
+
+
+
+void depositBall(){
+  stopped();
+  tilt.write(58);
+  for(int i=166;i>89;i--){
+    Serial.println(i);
+    grip.write(i);
+    delay(50);
+  }
+  delay(4000);
 }
 
 
@@ -136,9 +155,23 @@ int detectIntersection(){
   } 
 }
 
+void checkBall(){
+  if(!digitalRead(Lbumper) || !digitalRead(Rbumper)){
+      grabBall();
+      Serial.println("grabbing ball");
+      backwards();
+      delay(1000);
+      pivot('E',180);
+  }
+}
 
 int followLine(){
   while(1){
+
+    checkBall();
+
+
+    
     delay(400);
     while(analogRead(sensorR) > RTHRESH){     //veering left
       Serial.println("Left loop");
@@ -159,6 +192,7 @@ int followLine(){
         return 1;
         break;
       }
+      checkBall();
     }
 
     while(analogRead(sensorL) > LTHRESH){     //veering right
@@ -179,6 +213,7 @@ int followLine(){
         return 1;
         break;
       }
+      checkBall();
     }
      int inters = detectIntersection();
      if(inters == 1){
@@ -209,7 +244,7 @@ void setup() {
 
   tilt.attach(12);
   grip.attach(13);
-
+  tilt.write(46);
   left_speed = 100;               //temporary for troubleshooting
   right_speed = 100;
  // left_speed = EEPROM.read(0); //this is how it should be
@@ -220,14 +255,14 @@ void setup() {
 //----------------------------------LOOP
 void loop() {
 
-  /* line stuff that works
-  int distance = followLine();
-  if(distance == 1){
-    pivot('R',90);
+//  line stuff that works
+  int distance = distance +  followLine();
+  if(distance == 3){
+    pivot('L',90);
     distance = 0;
+    depositBall();
   }
-  */
-  grabBall();
+  checkBall();
   
   
 }
