@@ -38,7 +38,7 @@ byte right_speed;
 int inters = 0;
 
 
-//----------------------------------BASIC FUNCTIONS
+//------------------------------------------------------BASIC FUNCTIONS
 void forward(){
   digitalWrite(Ldirection, HIGH);
   digitalWrite(Rdirection, HIGH);
@@ -64,7 +64,7 @@ void backwards(){
 }
 
 void pivot(char direction, int degrees){            //pivot function
-  int counter = 0;
+  int counter = 0;                                  //this function is VERY dependant on battery charge level
   switch (degrees){
     case 90:                     //left rotation
       if (direction == 'L'){
@@ -115,7 +115,8 @@ void pivot(char direction, int degrees){            //pivot function
 }
 
 
-//----------------------------------COMPLEX FUNCTIONS
+//------------------------------------------------------COMPLEX FUNCTIONS
+//----------------------------------------------BALLS
 void grabBall(){
   stopped();
   tilt.write(46);
@@ -126,8 +127,6 @@ void grabBall(){
   }
   delay(4000);
 }
-
-
 
 void depositBall(){
   stopped();
@@ -140,19 +139,14 @@ void depositBall(){
   delay(4000);
 }
 
-
-int detectIntersection(){
-  if((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH)) {
-      Serial.println("Intersection detected!");
-      digitalWrite(LED,HIGH);
-      delay(200);               //this delay will change with contrast
-      stopped();
-      digitalWrite(LED,LOW);
-      delay(2000);
-      forward();
-      delay(300);
-      return 1;
-  } 
+void checkBall(){
+  if(!digitalRead(Lbumper) || !digitalRead(Rbumper)){
+      grabBall();
+      Serial.println("grabbing ball");
+      backwards();
+      delay(1000);
+      pivot('E',180);
+  }
 }
 
 /*void getBall(int ballNum){
@@ -217,24 +211,24 @@ ballData[ballNum-1] = 1;          //updates the array to show each ball that is 
 */
 
 
-
-void checkBall(){
-  if(!digitalRead(Lbumper) || !digitalRead(Rbumper)){
-      grabBall();
-      Serial.println("grabbing ball");
-      backwards();
-      delay(1000);
-      pivot('E',180);
-  }
+//----------------------------------------------NAVIGATION
+int detectIntersection(){
+  if((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH)) {
+      Serial.println("Intersection detected!");
+      digitalWrite(LED,HIGH);
+      delay(200);               //this delay will change with contrast
+      stopped();
+      digitalWrite(LED,LOW);
+      delay(2000);
+      forward();
+      delay(300);
+      return 1;
+  } 
 }
 
 int followLine(){
   while(1){
-
-    checkBall();
-
-
-    
+    checkBall(); 
     delay(400);
     while(analogRead(sensorR) > RTHRESH){     //veering left
       Serial.println("Left loop");
@@ -289,12 +283,11 @@ int followLine(){
 }
 
 
-
-//----------------------------------SETUP
+//----------------------------------------------SETUP
 void setup() {
   Serial.begin(9600);
   
-  pinMode(LED, OUTPUT);
+  pinMode(LED, OUTPUT);     //this LED will turn on when an intersection has been detected
   IRserial.attach(9, -1);
 
   pinMode(Lbumper, INPUT);
@@ -307,7 +300,8 @@ void setup() {
 
   tilt.attach(12);
   grip.attach(13);
-  tilt.write(50);
+  tilt.write(50);       //the correct height for the arm
+  
   left_speed = 100;               //temporary for troubleshooting
   right_speed = 100;
  // left_speed = EEPROM.read(0); //this is how it should be
@@ -315,7 +309,7 @@ void setup() {
 }
 
 
-//----------------------------------LOOP
+//----------------------------------------------LOOP
 void loop() {
 
 //  line stuff that works
@@ -325,7 +319,7 @@ void loop() {
     pivot('L',90);
     depositBall();
   }
-  checkBall();
+  checkBall();            //currently, checkBall is called in multiple places because the program may be stuck in a loops somewhere
   
   
 }
