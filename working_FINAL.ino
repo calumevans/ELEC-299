@@ -14,8 +14,9 @@ QSerial IRserial;
 //#define something         #
 #define IRreciever          9
 #define wheelEncoder        10
+//#define something           #
 
-Servo pan, tilt, grip;   //pins 11, 12, 13
+Servo tilt, grip;   //pins 12, 13
 
 //----------------------------------ANALOG PINS
 #define sensorL             0
@@ -38,31 +39,31 @@ int inters = 0;
 
 
 //----------------------------------BASIC FUNCTIONS
-void forward() {
+void forward(){
   digitalWrite(Ldirection, HIGH);
   digitalWrite(Rdirection, HIGH);
   analogWrite(Lspeed, left_speed);
   analogWrite(Rspeed, right_speed);
 }
 
-void stopped() {
+void stopped(){
   analogWrite(Lspeed, 0);
   analogWrite(Rspeed, 0);
 }
 
-void backwards() {
+void backwards(){
   digitalWrite(Ldirection, LOW);
   digitalWrite(Rdirection, LOW);
   analogWrite(Lspeed, left_speed);
   analogWrite(Rspeed, right_speed);
 }
 
-void pivot(char direction, int degrees) {            //pivot function
+void pivot(char direction, int degrees){            //pivot function
   int counter = 0;
-  switch (degrees) {
+  switch (degrees){
     case 90:                     //left rotation
-      if (direction == 'L') {
-        while (counter < 20) {
+      if (direction == 'L'){
+        while (counter < 20){
           digitalWrite(Ldirection, LOW);
           digitalWrite(Rdirection, HIGH);
           analogWrite(Lspeed, left_speed);
@@ -75,7 +76,7 @@ void pivot(char direction, int degrees) {            //pivot function
         }
         counter = 0;
 
-      } else if (direction == 'R') {      //right rotation
+      } else if (direction == 'R'){      //right rotation
         while (counter < 20) {
           digitalWrite(Ldirection, HIGH);
           digitalWrite(Rdirection, LOW);
@@ -93,7 +94,7 @@ void pivot(char direction, int degrees) {            //pivot function
       }
       break;
     case 180:
-      while (counter < 35) {
+      while (counter < 35){
         digitalWrite(Ldirection, HIGH);
         digitalWrite(Rdirection, LOW);
         analogWrite(Lspeed, left_speed);
