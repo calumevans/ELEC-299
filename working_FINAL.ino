@@ -99,7 +99,7 @@ void pivot(char direction, int degrees){            //pivot function
       }
       break;
     case 180:
-      while (counter < 145){
+      while (counter < 110){
         digitalWrite(Ldirection, HIGH);
         digitalWrite(Rdirection, LOW);
         analogWrite(Lspeed, left_speed);
@@ -154,6 +154,69 @@ int detectIntersection(){
       return 1;
   } 
 }
+
+/*void getBall(int ballNum){
+  Serial.print("Ball #");
+  Serial.print(ballNum);
+  Serial.println(" is being captured");  
+  switch(ballNum){            //there are 15 balls in this competition, this is getting the coordinates for the balls and using pos() to travel
+    case 1:
+      pos(-3,-2);
+      checkBall();
+      pos(-1,-3);   /go to bin
+      break;
+    case 2:
+      pos(-3,-1);
+      break;
+    case 3:
+      pos(-3,0);
+      break;
+    case 4:
+      pos(-3,1);
+      break;
+    case 5:
+      pos(-3,2);
+      break;
+    case 6:
+      pos(-2,3);
+      break;
+    case 7:
+      pos(-1,3);
+      break;
+    case 8:
+      pos(0,3);
+      break;
+    case 9:
+      pos(1,3);
+      break;
+    case 10:
+      pos(2,3);
+      break;
+    case 11:
+      pos(3,2);
+      break;
+    case 12:
+      pos(3,1);
+      break;
+    case 13:
+      pos(3,0);
+      break;
+    case 14:
+      pos(3,-1);
+      break;
+    case 15:
+      pos(3,-2);
+      break;
+    default:
+      Serial.println("Invalid ball number");
+      break; v
+  }
+ballData[ballNum-1] = 1;          //updates the array to show each ball that is captured (denoted with a 1)
+}
+
+*/
+
+
 
 void checkBall(){
   if(!digitalRead(Lbumper) || !digitalRead(Rbumper)){
@@ -244,7 +307,7 @@ void setup() {
 
   tilt.attach(12);
   grip.attach(13);
-  tilt.write(46);
+  tilt.write(50);
   left_speed = 100;               //temporary for troubleshooting
   right_speed = 100;
  // left_speed = EEPROM.read(0); //this is how it should be
@@ -257,9 +320,9 @@ void loop() {
 
 //  line stuff that works
   int distance = distance +  followLine();
-  if(distance == 3){
+  Serial.println(distance);
+  if(distance == 2){
     pivot('L',90);
-    distance = 0;
     depositBall();
   }
   checkBall();
