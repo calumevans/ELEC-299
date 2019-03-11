@@ -14,7 +14,7 @@ QSerial IRserial;
 //#define something         #
 #define IRreciever          9
 #define wheelEncoder        10
-//#define something           #
+#define LED                 11
 
 Servo tilt, grip;   //pins 12, 13
 
@@ -129,8 +129,10 @@ void grabBall(){
 int detectIntersection(){
   if((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH)) {
       Serial.println("Intersection detected!");
+      digitalWrite(LED,HIGH);
       delay(200);               //this delay will change with contrast
       stopped();
+      digitalWrite(LED,LOW);
       delay(2000);
       forward();
       delay(300);
@@ -197,7 +199,8 @@ int followLine(){
 //----------------------------------SETUP
 void setup() {
   Serial.begin(9600);
-
+  
+  pinMode(LED, OUTPUT);
   IRserial.attach(9, -1);
 
   pinMode(Lbumper, INPUT);
@@ -208,7 +211,6 @@ void setup() {
   pinMode(Rdirection, OUTPUT);
   pinMode(wheelEncoder, INPUT);
 
-  pan.attach(11);
   tilt.attach(12);
   grip.attach(13);
 
@@ -222,12 +224,12 @@ void setup() {
 //----------------------------------LOOP
 void loop() {
 
-  /* line stuff that works
+  // line stuff that works
   int distance = followLine();
   if(distance == 1){
     pivot('R',90);
     distance = 0;
-  */
-  grabBall();
+  }
+  //grabBall();
   
 }
