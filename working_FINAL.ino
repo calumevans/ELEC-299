@@ -379,10 +379,12 @@ void startButton(){
 }
 
 void doubleBlink(){
-  digitalWrite(LED,HIGH);
-  delay(50);
-  digitalWrite(LED,LOW);
-  delay(50);
+  for(int i=0;i<2;i++){
+    digitalWrite(LED,HIGH);
+    delay(50);
+    digitalWrite(LED,LOW);
+    delay(50);
+  }
 }
 
 
