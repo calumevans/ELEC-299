@@ -116,6 +116,91 @@ void pivot(char direction, int degrees){            //pivot function
 
 
 //------------------------------------------------------COMPLEX FUNCTIONS
+//----------------------------------------------SEQUENCE
+/*
+int identifyStartingPosition(){         //left = 1, centre = 2, right = 3
+    int startingPosition = 0;
+    Serial.print("Identifying starting position...");
+
+    while(startingPosition == 0){                     //constantly checking for character
+      switch(char(IRserial.receive(200))){
+          case 'L':
+            Serial.println("Left");
+            startingPosition = 1;
+            break;
+          case 'C':
+            Serial.println("Center");
+            startingPosition = 2;
+            break;
+          case 'R':
+            Serial.println("Right");
+            startingPosition = 3;
+            break;
+      }
+      delay(80);
+    }
+  return startingPosition;
+}
+
+void sequence(int location){
+  location = identifyStartingPosition();
+  Serial.print("Doing sequence #");
+  Serial.println(location);
+  switch(location){
+    case 1:            //left robot: 7,1,13,4,6
+      getBall(7);
+      delay(500);
+      
+      getBall(1);
+      delay(500);
+      
+      getBall(13);
+      delay(500);
+      
+      getBall(4);
+      delay(500);
+      
+      getBall(6);
+      delay(500);
+      break;  
+    case 2:             //centre robot: 8,2,14,5,11
+      getBall(8);
+      delay(500);
+      
+      getBall(2);
+      delay(500);
+      
+      getBall(14);
+      delay(500);
+      
+      getBall(5);
+      delay(500);
+      
+      getBall(11);
+      delay(500);
+      break;
+    case 3:           //right robot: 9,3,15,10,12
+      getBall(9);
+      delay(500);
+      
+      getBall(3);
+      delay(500);
+      
+      getBall(15);
+      delay(500);
+      
+      getBall(10);
+      delay(500);
+      
+      getBall(12);
+      delay(500);
+      break;      
+  }
+  Serial.print("Finished sequence!");
+  Serial.println(ballData);
+}
+*/
+
 //----------------------------------------------BALLS
 void grabBall(){
   stopped();
@@ -287,7 +372,7 @@ int followLine(){
 void setup() {
   Serial.begin(9600);
   
-  pinMode(LED, OUTPUT);     //this LED will turn on when an intersection has been detected
+  pinMode(LED, OUTPUT);     //this LED will turn on when an intersection has been detected, and when completes a sequence
   IRserial.attach(9, -1);
 
   pinMode(Lbumper, INPUT);
