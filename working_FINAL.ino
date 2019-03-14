@@ -11,7 +11,7 @@ QSerial IRserial;
 #define Lspeed              5
 #define Rspeed              6
 #define Rdirection          7
-//#define something         #
+#define button              8
 #define IRreciever          9
 #define wheelEncoder        10
 #define LED                 11
@@ -22,7 +22,6 @@ Servo tilt, grip;   //pins 12, 13
 #define sensorL             0
 #define sensorR             1
 #define sensorC             2
-#define forceBall           3
 #define range               4
 
 
@@ -139,61 +138,62 @@ int identifyStartingPosition(){         //left = 1, centre = 2, right = 3
       }
       delay(80);
     }
+  doubleBlink();
   return startingPosition;
 }
 
-void sequence(int location){
+void sequence(int location){                      //the sequence the robot follows
   location = identifyStartingPosition();
   Serial.print("Doing sequence #");
   Serial.println(location);
   switch(location){
     case 1:            //left robot: 7,1,13,4,6
       getBall(7);
-      delay(500);
+      doubleBlink();
       
       getBall(1);
-      delay(500);
+      doubleBlink();
       
       getBall(13);
-      delay(500);
+      doubleBlink();
       
       getBall(4);
-      delay(500);
+      doubleBlink();
       
       getBall(6);
-      delay(500);
+      doubleBlink();
       break;  
     case 2:             //centre robot: 8,2,14,5,11
       getBall(8);
-      delay(500);
+      doubleBlink();
       
       getBall(2);
-      delay(500);
+      doubleBlink();
       
       getBall(14);
-      delay(500);
+      doubleBlink();
       
       getBall(5);
-      delay(500);
+      doubleBlink();
       
       getBall(11);
-      delay(500);
+      doubleBlink();
       break;
     case 3:           //right robot: 9,3,15,10,12
       getBall(9);
-      delay(500);
+      doubleBlink();
       
       getBall(3);
-      delay(500);
+      doubleBlink();
       
       getBall(15);
-      delay(500);
+      doubleBlink();
       
       getBall(10);
-      delay(500);
+      doubleBlink();
       
       getBall(12);
-      delay(500);
+      doubleBlink();
       break;      
   }
   Serial.print("Finished sequence!");
@@ -210,7 +210,7 @@ void grabBall(){
     grip.write(i);
     delay(50);
   }
-  delay(4000);
+  delay(3000);
 }
 
 void depositBall(){
@@ -221,16 +221,14 @@ void depositBall(){
     grip.write(i);
     delay(50);
   }
-  delay(4000);
+  delay(3000);
 }
 
 void checkBall(){
   if(!digitalRead(Lbumper) || !digitalRead(Rbumper)){
       grabBall();
       Serial.println("grabbing ball");
-      backwards();
-      delay(1000);
-      pivot('E',180);
+      turnAround();
   }
 }
 
@@ -367,12 +365,31 @@ int followLine(){
   }  
 }
 
+void turnAround(){        //used for after the robot hits a wall (grabbing or depositing a ball)
+  backwards();
+  delay(1000);
+  pivot('E',180); 
+}
+
+//----------------------------------------------MISCELLANEOUS
+void startButton(){
+  Serial.println("Waiting for start button");
+  while(digitalRead(button)){}                  //stuck in a loop until button is pressed
+  Serial.println("Start button pressed!");
+}
+
+void doubleBlink(){
+  digitalWrite(LED,HIGH);
+  delay(50);
+  digitalWrite(LED,LOW);
+  delay(50);
+}
+
 
 //----------------------------------------------SETUP
 void setup() {
   Serial.begin(9600);
   
-  pinMode(LED, OUTPUT);     //this LED will turn on when an intersection has been detected, and when completes a sequence
   IRserial.attach(9, -1);
 
   pinMode(Lbumper, INPUT);
@@ -382,7 +399,13 @@ void setup() {
   pinMode(Rspeed, OUTPUT);
   pinMode(Rdirection, OUTPUT);
   pinMode(wheelEncoder, INPUT);
+  pinMode(LED, OUTPUT);     //this LED will turn on when an intersection has been detected, and when completes a sequence
+  pinMode(button, INPUT);
 
+  //-----------------------
+  //startButton();            //program will not continue until button is pressed
+  //-----------------------
+  
   tilt.attach(12);
   grip.attach(13);
   tilt.write(50);       //the correct height for the arm
