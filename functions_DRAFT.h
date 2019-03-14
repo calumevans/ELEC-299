@@ -111,6 +111,11 @@ int identifyStartingPosition(){
 }
 
 
+void turnAround(){              //just randomly thought that this would be a good idea
+    
+       
+}
+
 void followLine(){
 int val1 = analogRead(A0);
  int val2 = analogRead(A1);
