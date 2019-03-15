@@ -203,6 +203,7 @@ void checkWall(){
     }else if(grabOrDeposit == 'D'){    //for depositing the ball
       depositBall();
     }
+  }
 }
 
 /*void getBall(int ballNum){
@@ -366,7 +367,7 @@ void doubleBlink(){               //used to denote that things happen during the
 
 int bluetoothEmergency(){
   //for EPBMX, the serial.begin must be changed to "115200"
-
+  int completion = 0;
   while(Serial.available() && (completion == 0)){         //completion goes to 1 when a task is completed
     int code = Serial.read();
     Serial.print("BT Number Recieved: ");
@@ -375,16 +376,15 @@ int bluetoothEmergency(){
     switch(code){
       case 72:            //pressed H, make the robot go back to home base
         Serial.println("Going back to home base");
-        pos(0,0);
+        //pos(0,0);
         Serial.println("Now at home base");
         completion++;
         break;
       case 66:            //pressed B, make the robot go to bin and deposit ball
-        pos(3,-1);     //the position of the bin
+        //pos(3,-1);     //the position of the bin
         depositBall();
         completion++;
         break;
-    }
       case 73:            //pressed I, mark that the robot passed an intersection
         return 1;
         completion++;
