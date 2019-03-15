@@ -302,8 +302,8 @@ int followLine(){
       digitalWrite(Rdirection, HIGH);
       analogWrite(Lspeed, left_speed);
       analogWrite(Rspeed, 0);
-      inters = detectIntersection();
-      if(inters == 1){
+      inters = detectIntersection() + bluetoothEmergency();       //if Bluetooth emergency will be 1 if missed an intersection
+      if(inters == 1){ 
         inters = 0;
         return 1;
         break;
@@ -332,7 +332,7 @@ int followLine(){
       }
       checkWall();
     }
-     int inters = detectIntersection();
+     int inters = detectIntersection() + bluetoothEmergency();
      if(inters == 1){
         inters = 0;
         return 1;
@@ -364,7 +364,40 @@ void doubleBlink(){               //used to denote that things happen during the
   }
 }
 
+int bluetoothEmergency(){
+  //for EPBMX, the serial.begin must be changed to "115200"
 
+  while(Serial.available() && (completion == 0)){         //completion goes to 1 when a task is completed
+    int code = Serial.read();
+    Serial.print("BT Number Recieved: ");
+    Serial.println(code);
+    
+    switch(code){
+      case 72:            //pressed H, make the robot go back to home base
+        Serial.println("Going back to home base");
+        pos(0,0);
+        Serial.println("Now at home base");
+        completion++;
+        break;
+      case 66:            //pressed B, make the robot go to bin and deposit ball
+        pos(3,-1);     //the position of the bin
+        depositBall();
+        completion++;
+        break;
+    }
+      case 73:            //pressed I, mark that the robot passed an intersection
+        return 1;
+        completion++;
+        break;
+    }
+  }
+  completion = 0;
+  if(!Serial.available()){
+    Serial.println("Serial is unavailable");
+  }
+}
+  
+  
 //----------------------------------------------SETUP
 void setup() {
   Serial.begin(9600);
