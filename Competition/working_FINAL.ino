@@ -35,6 +35,7 @@ byte left_speed;                    //speed stored on each robot for going strai
 byte right_speed;
 
 int inters = 0;
+char grabOrDeposit = 'G';         //global variable which charges based on if robot is grabbing/depositing
 
 
 //------------------------------------------------------BASIC FUNCTIONS
@@ -195,23 +196,26 @@ void depositBall(){
   delay(3000);
 }
 
-void checkBall(){
+void checkWall(){
   if(!digitalRead(Lbumper) || !digitalRead(Rbumper)){
+    if(grabOrDeposit == 'G'){          //for grabbing the ball
       grabBall();
-      Serial.println("grabbing ball");
-      turnAround();
-  }
+    }else if(grabOrDeposit == 'D'){    //for depositing the ball
+      depositBall();
+    }
 }
 
 /*void getBall(int ballNum){
   Serial.print("Ball #");
   Serial.print(ballNum);
   Serial.println(" is being captured");  
+  grabOrDeposit = 'G';
   switch(ballNum){            //there are 15 balls in this competition, this is getting the coordinates for the balls and using pos() to travel
     case 1:
       pos(-3,-2);
-      checkBall();
+      checkWall();
       pos(-1,-3);   /go to bin
+      checkWall();
       break;
     case 2:
       pos(-3,-1);
@@ -283,7 +287,7 @@ int detectIntersection(){
 
 int followLine(){
   while(1){
-    checkBall(); 
+    checkWall(); 
     delay(400);
     while(analogRead(sensorR) > RTHRESH){     //veering left
       Serial.println("veering left loop");
@@ -304,7 +308,7 @@ int followLine(){
         return 1;
         break;
       }
-      checkBall();
+      checkWall();
     }
 
     while(analogRead(sensorL) > LTHRESH){     //veering right
@@ -326,7 +330,7 @@ int followLine(){
         return 1;
         break;
       }
-      checkBall();
+      checkWall();
     }
      int inters = detectIntersection();
      if(inters == 1){
@@ -402,7 +406,7 @@ void loop() {
     pivot('L',90);
     depositBall();
   }
-  checkBall();            //currently, checkBall is called in multiple places because the program may be stuck in a loops somewhere
+  checkWall();            //currently, checkWall is called in multiple places because the program may be stuck in a loops somewhere
   
   
 }
