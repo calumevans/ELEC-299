@@ -50,7 +50,6 @@ void stopped(){
   analogWrite(Lspeed, 0);
   analogWrite(Rspeed, 0);
     Serial.println("Stopped");
-
 }
 
 void backwards(){
@@ -59,7 +58,6 @@ void backwards(){
   analogWrite(Lspeed, left_speed);
   analogWrite(Rspeed, right_speed);
   Serial.println("Backwards");
-
 }
 
 void pivot(char direction, int degrees){            //pivot function
@@ -147,53 +145,26 @@ void sequence(int location){                      //the sequence the robot follo
   Serial.print("Doing sequence #");
   Serial.println(location);
   switch(location){
-    case 1:            //left robot: 7,1,13,4,6
-      getBall(7);
-      doubleBlink();
-      
+    case 1:             //left robot: 7,1,13,4,6
+      getBall(7);    
       getBall(1);
-      doubleBlink();
-      
       getBall(13);
-      doubleBlink();
-      
       getBall(4);
-      doubleBlink();
-      
       getBall(6);
-      doubleBlink();
       break;  
     case 2:             //centre robot: 8,2,14,5,11
       getBall(8);
-      doubleBlink();
-      
       getBall(2);
-      doubleBlink();
-      
       getBall(14);
-      doubleBlink();
-      
       getBall(5);
-      doubleBlink();
-      
       getBall(11);
-      doubleBlink();
       break;
-    case 3:           //right robot: 9,3,15,10,12
+    case 3:             //right robot: 9,3,15,10,12
       getBall(9);
-      doubleBlink();
-      
       getBall(3);
-      doubleBlink();
-      
       getBall(15);
-      doubleBlink();
-      
       getBall(10);
-      doubleBlink();
-      
       getBall(12);
-      doubleBlink();
       break;      
   }
   Serial.print("Finished sequence!");
@@ -289,6 +260,7 @@ void checkBall(){
       break; v
   }
 ballData[ballNum-1] = 1;          //updates the array to show each ball that is captured (denoted with a 1)
+doubleBlink();
 }
 
 */
@@ -314,12 +286,12 @@ int followLine(){
     checkBall(); 
     delay(400);
     while(analogRead(sensorR) > RTHRESH){     //veering left
-      Serial.println("Left loop");
-      Serial.println("Left:");
-      Serial.println(analogRead(sensorL));
-      Serial.println("Center");
-      Serial.println(analogRead(sensorC));
-      Serial.println("Right:");
+      Serial.println("veering left loop");
+      Serial.print("Left/Centre/Right:  ");
+      Serial.print(analogRead(sensorL));
+      Serial.print(", ");
+      Serial.print(analogRead(sensorC));
+      Serial.print(", ");
       Serial.println(analogRead(sensorR));
       
       digitalWrite(Ldirection, HIGH);
@@ -336,13 +308,14 @@ int followLine(){
     }
 
     while(analogRead(sensorL) > LTHRESH){     //veering right
-      Serial.println("right loop");
-      Serial.println("Left:");
-      Serial.println(analogRead(sensorL));
-      Serial.println("Center");
-      Serial.println(analogRead(sensorC));
-      Serial.println("Right:");
+      Serial.println("veering right loop");
+      Serial.print("Left/Centre/Right:  ");
+      Serial.print(analogRead(sensorL));
+      Serial.print(", ");
+      Serial.print(analogRead(sensorC));
+      Serial.print(", ");
       Serial.println(analogRead(sensorR));
+      
       digitalWrite(Ldirection, HIGH);
       digitalWrite(Rdirection, HIGH);
       analogWrite(Lspeed, 0);
@@ -368,7 +341,7 @@ int followLine(){
 void turnAround(){        //used for after the robot hits a wall (grabbing or depositing a ball)
   backwards();
   delay(1000);
-  pivot('E',180); 
+  pivot('E',180);
 }
 
 //----------------------------------------------MISCELLANEOUS
@@ -378,7 +351,7 @@ void startButton(){
   Serial.println("Start button pressed!");
 }
 
-void doubleBlink(){
+void doubleBlink(){               //used to denote that things happen during the competition
   for(int i=0;i<2;i++){
     digitalWrite(LED,HIGH);
     delay(50);
@@ -401,7 +374,7 @@ void setup() {
   pinMode(Rspeed, OUTPUT);
   pinMode(Rdirection, OUTPUT);
   pinMode(wheelEncoder, INPUT);
-  pinMode(LED, OUTPUT);     //this LED will turn on when an intersection has been detected, and when completes a sequence
+  pinMode(LED, OUTPUT);     //this LED will turn on when an intersection has been detected, and when a sequence is completed
   pinMode(button, INPUT);
 
   //-----------------------
@@ -412,8 +385,8 @@ void setup() {
   grip.attach(13);
   tilt.write(50);       //the correct height for the arm
   
-  left_speed = 100;               //temporary for troubleshooting
-  right_speed = 100;
+  left_speed = 120;               //temporary for troubleshooting
+  right_speed = 120;
  // left_speed = EEPROM.read(0); //this is how it should be
   //right_speed = EEPROM.read(1);
 }
@@ -422,7 +395,7 @@ void setup() {
 //----------------------------------------------LOOP
 void loop() {
 
-//  line stuff that works
+  //a pseudo sequence
   int distance = distance +  followLine();
   Serial.println(distance);
   if(distance == 2){
