@@ -9,13 +9,19 @@ void bluetoothEmergency(){
     Serial.println(code);
     
     switch(code){
-      case ##:            //make the robot go back to home base
+      case 1:            //make the robot go back to home base
         Serial.println("Going back to home base");
         pos(0,0);
         Serial.println("Now at home base");
         completion++;
         break;
-      case ##:            //go to deposit ball
+      case 50:            //make the robot go back to home base
+        pos(3,-1);     //the position of the bin
+        depositBall();
+        completion++;
+        break;
+    }
+      case 51:            //make the robot go back to home base
         pos(3,-1);     //the position of the bin
         depositBall();
         completion++;
