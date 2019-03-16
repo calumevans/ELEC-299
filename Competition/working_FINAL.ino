@@ -396,6 +396,87 @@ int bluetoothEmergency(){
     Serial.println("Serial is unavailable");
   }
 }
+
+void StartPosition() 
+{
+	int X;
+	int Y;
+	
+	if (Identify Starting Position = S1) then
+		X = -1;
+		Y = -3;
+	if (Identify Starting Position = S2) then
+		X = 0;
+		Y = -3;
+	if (Identify Starting Position = S3) then
+		X = 1;
+		Y = -3;
+	OX = X;
+	OY = Y;
+}
+Void UCmove(int l){
+for (UC=0;UC<l){
+		forward ()
+  		if (detect intercetion==true){
+		UC=UC+1;
+		}
+		else if(leftbumper==0&&rightbumper==0){//hits into the wall
+		UC=UC+1;
+		}
+	}
+
+}
+
+void PMove(int m, int n)
+{	
+	X1 = m;
+	Y1 = n;
+	X2 = X1 - X;
+	Y2 = Y1 - Y;
+	if(Y2 = 6){
+		UCmove(5)
+if (X1 < 0) then
+		pivot left(90);
+		UCmove(X2);
+		pivot right(90);
+		else if (X1 > 0) then
+		pivot right(90);
+		UCmove(X2)
+		pivot left(90);
+		Ucmove(1);
+		
+	}
+	else{	
+		
+	UCmove(Y2);
+	if (X1 < 0) then
+	pivot left(90);
+	else if (X1 > 0) then
+	pivot right(90);
+	UCmove(X2);
+     }
+}
+
+void resetPosition() //After each time pick up and drop the object, we need to call this function
+{
+	pivot(180);
+	if(Y2=6) then
+		X = -X1;
+		Y = -Y1;
+		X1 = -OX;
+		Y1 = -OY;
+ else then
+if (X1 < 0) then
+		X = -Y1;
+		Y = X1;
+		X1 = -OY;
+		Y1 = OX;
+	else
+		X = Y1;
+		Y = -X1;
+		X1 = OY;
+		Y1 = -OX;
+}
   
   
 //----------------------------------------------SETUP
