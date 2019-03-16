@@ -36,7 +36,13 @@ byte right_speed;
 
 int inters = 0;
 char grabOrDeposit = 'G';         //global variable which charges based on if robot is grabbing/depositing
+int startingPosition = 0;
 
+int X;
+int Y;
+int UC;
+int OX,OY;
+int X1,Y1,X2,Y2;
 
 //------------------------------------------------------BASIC FUNCTIONS
 void forward(){
@@ -97,7 +103,7 @@ void pivot(char direction, int degrees){            //pivot function
       }
       break;
     case 180:
-      while (counter < 110){
+      while (counter < 180){
         digitalWrite(Ldirection, HIGH);
         digitalWrite(Rdirection, LOW);
         analogWrite(Lspeed, left_speed);
@@ -115,11 +121,9 @@ void pivot(char direction, int degrees){            //pivot function
 
 //------------------------------------------------------COMPLEX FUNCTIONS
 //----------------------------------------------SEQUENCE
-/*
-int identifyStartingPosition(){         //left = 1, centre = 2, right = 3
-    int startingPosition = 0;
-    Serial.print("Identifying starting position...");
 
+int identifyStartingPosition(){         //left = 1, centre = 2, right = 3
+    Serial.print("Identifying starting position...");
     while(startingPosition == 0){                     //constantly checking for character
       switch(char(IRserial.receive(200))){
           case 'L':
@@ -140,11 +144,11 @@ int identifyStartingPosition(){         //left = 1, centre = 2, right = 3
   doubleBlink();
   return startingPosition;
 }
-
 void sequence(int location){                      //the sequence the robot follows
   location = identifyStartingPosition();
   Serial.print("Doing sequence #");
   Serial.println(location);
+  startPosition();
   switch(location){
     case 1:             //left robot: 7,1,13,4,6
       getBall(7);    
@@ -169,31 +173,33 @@ void sequence(int location){                      //the sequence the robot follo
       break;      
   }
   Serial.print("Finished sequence!");
-  Serial.println(ballData);
+//  Serial.println(ballData);
 }
-*/
+
 
 //----------------------------------------------BALLS
 void grabBall(){
   stopped();
   tilt.write(46);
   for(int i=90;i<166;i++){
-    Serial.println(i);
+    //Serial.println(i);
     grip.write(i);
     delay(50);
   }
   delay(3000);
+  resetPosition();
 }
 
 void depositBall(){
   stopped();
   tilt.write(58);
   for(int i=166;i>89;i--){
-    Serial.println(i);
+    //Serial.println(i);
     grip.write(i);
     delay(50);
   }
   delay(3000);
+  resetPosition();
 }
 
 void checkWall(){
@@ -203,10 +209,11 @@ void checkWall(){
     }else if(grabOrDeposit == 'D'){    //for depositing the ball
       depositBall();
     }
+    turnAround();
   }
 }
 
-/*void getBall(int ballNum){
+void getBall(int ballNum){
   Serial.print("Ball #");
   Serial.print(ballNum);
   Serial.println(" is being captured");  
@@ -215,7 +222,8 @@ void checkWall(){
     case 1:
       pos(-3,-2);
       checkWall();
-      pos(-1,-3);   /go to bin
+      grabOrDeposit = 'D';
+      pos(X1,Y1);   //go to bin
       checkWall();
       break;
     case 2:
@@ -262,16 +270,95 @@ void checkWall(){
       break;
     default:
       Serial.println("Invalid ball number");
-      break; v
+      break;
   }
 ballData[ballNum-1] = 1;          //updates the array to show each ball that is captured (denoted with a 1)
 doubleBlink();
 }
 
-*/
 
 
 //----------------------------------------------NAVIGATION
+
+
+void startPosition(){
+  if (startingPosition == 1){
+    X = -1;
+    Y = -3;
+  }else if(startingPosition == 2){
+    X = 0;
+    Y = -3;
+  }else if(startingPosition == 3){
+    X = 1;
+    Y = -3;
+  }
+  OX = X;
+  OY = Y;
+}
+
+
+void UCmove(int l){
+  while(!UC){
+    forward();
+    UC = detectIntersection();
+    if(!digitalRead(Lbumper) || !digitalRead(Lbumper)){//hits into the wall
+        UC++;
+    }
+  }
+}
+
+void pos(int m, int n){ 
+  X1 = m;
+  Y1 = n;
+  X2 = X1 - X;
+  Y2 = Y1 - Y;
+  if(Y2 == 6){
+    UCmove(5);
+    if(X1 < 0){
+        pivot('L',90);
+        UCmove(X2);
+        pivot('R',90);
+    }else if(X1 > 0){
+        pivot('R',90);
+        UCmove(X2);
+        pivot('L',90);
+        UCmove(1);
+    }
+  }else{
+    UCmove(Y2);
+    if (X1 < 0){
+      pivot('L',90);
+    }else if (X1 > 0){
+      pivot('R',90);
+      UCmove(X2);
+    }
+  }
+}
+
+void resetPosition(){ //After each time pick up and drop the object, we need to call this function
+  turnAround();
+  if(Y2==6){
+    X = -X1;
+    Y = -Y1;
+    X1 = -OX;
+    Y1 = -OY;
+  }else{
+    if (X1 < 0){
+        X = -Y1;
+        Y = X1;
+        X1 = -OY;
+        Y1 = OX;
+    }else{
+        X = Y1;
+        Y = -X1;
+        X1 = OY;
+        Y1 = -OX;
+    }
+  }
+}
+
+
+
 int detectIntersection(){
   if((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH)) {
       Serial.println("Intersection detected!");
@@ -396,92 +483,11 @@ int bluetoothEmergency(){
     Serial.println("Serial is unavailable");
   }
 }
-
-void StartPosition() 
-{
-	int X;
-	int Y;
-	
-	if (Identify Starting Position = S1) then
-		X = -1;
-		Y = -3;
-	if (Identify Starting Position = S2) then
-		X = 0;
-		Y = -3;
-	if (Identify Starting Position = S3) then
-		X = 1;
-		Y = -3;
-	OX = X;
-	OY = Y;
-}
-Void UCmove(int l){
-for (UC=0;UC<l){
-		forward ()
-  		if (detect intercetion==true){
-		UC=UC+1;
-		}
-		else if(leftbumper==0&&rightbumper==0){//hits into the wall
-		UC=UC+1;
-		}
-	}
-
-}
-
-void PMove(int m, int n)
-{	
-	X1 = m;
-	Y1 = n;
-	X2 = X1 - X;
-	Y2 = Y1 - Y;
-	if(Y2 = 6){
-		UCmove(5)
-if (X1 < 0) then
-		pivot left(90);
-		UCmove(X2);
-		pivot right(90);
-		else if (X1 > 0) then
-		pivot right(90);
-		UCmove(X2)
-		pivot left(90);
-		Ucmove(1);
-		
-	}
-	else{	
-		
-	UCmove(Y2);
-	if (X1 < 0) then
-	pivot left(90);
-	else if (X1 > 0) then
-	pivot right(90);
-	UCmove(X2);
-     }
-}
-
-void resetPosition() //After each time pick up and drop the object, we need to call this function
-{
-	pivot(180);
-	if(Y2=6) then
-		X = -X1;
-		Y = -Y1;
-		X1 = -OX;
-		Y1 = -OY;
- else then
-if (X1 < 0) then
-		X = -Y1;
-		Y = X1;
-		X1 = -OY;
-		Y1 = OX;
-	else
-		X = Y1;
-		Y = -X1;
-		X1 = OY;
-		Y1 = -OX;
-}
   
   
 //----------------------------------------------SETUP
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   
   IRserial.attach(9, -1);
 
@@ -513,14 +519,7 @@ void setup() {
 //----------------------------------------------LOOP
 void loop() {
 
-  //a pseudo sequence
-  int distance = distance +  followLine();
-  Serial.println(distance);
-  if(distance == 2){
-    pivot('L',90);
-    depositBall();
-  }
-  checkWall();            //currently, checkWall is called in multiple places because the program may be stuck in a loops somewhere
-  
+  getBall(1);
+     
   
 }
