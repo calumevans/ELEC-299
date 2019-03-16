@@ -38,11 +38,11 @@ int inters = 0;
 char grabOrDeposit = 'G';         //global variable which charges based on if robot is grabbing/depositing
 int startingPosition = 0;
 
-int X;
-int Y;
-int UC;
+int Xstart;
+int Ystart;
+int UC = 0;
 int OX,OY;
-int X1,Y1,X2,Y2;
+int Xgoal,Ygoal,Xpath,Ypath;
 
 //------------------------------------------------------BASIC FUNCTIONS
 void forward(){
@@ -72,7 +72,8 @@ void pivot(char direction, int degrees){            //pivot function
   switch (degrees){
     case 90:                     //left rotation
       if (direction == 'L'){
-        while (counter < 25){
+        while (counter < 18){
+          Serial.println("Pivot left");
           digitalWrite(Ldirection, LOW);
           digitalWrite(Rdirection, HIGH);
           analogWrite(Lspeed, left_speed);
@@ -86,6 +87,7 @@ void pivot(char direction, int degrees){            //pivot function
         counter = 0;
 
       } else if (direction == 'R'){      //right rotation
+        Serial.println("Pivot right");
         while (counter < 25) {
           digitalWrite(Ldirection, HIGH);
           digitalWrite(Rdirection, LOW);
@@ -94,8 +96,8 @@ void pivot(char direction, int degrees){            //pivot function
 
           int LwheelVal = digitalRead(wheelEncoder);
           counter = counter + LwheelVal;
-          Serial.print("Counter: ");
-          Serial.println(counter);
+          //Serial.print("Counter: ");
+          //Serial.println(counter);
         }
         counter = 0;
       } else {
@@ -103,7 +105,8 @@ void pivot(char direction, int degrees){            //pivot function
       }
       break;
     case 180:
-      while (counter < 180){
+      while (counter < 56){
+        Serial.println("Pivot 180");
         digitalWrite(Ldirection, HIGH);
         digitalWrite(Rdirection, LOW);
         analogWrite(Lspeed, left_speed);
@@ -209,7 +212,6 @@ void checkWall(){
     }else if(grabOrDeposit == 'D'){    //for depositing the ball
       depositBall();
     }
-    turnAround();
   }
 }
 
@@ -223,7 +225,7 @@ void getBall(int ballNum){
       pos(-3,-2);
       checkWall();
       grabOrDeposit = 'D';
-      pos(X1,Y1);   //go to bin
+      pos(Xgoal,Ygoal);   //go to bin
       checkWall();
       break;
     case 2:
@@ -283,24 +285,26 @@ doubleBlink();
 
 void startPosition(){
   if (startingPosition == 1){
-    X = -1;
-    Y = -3;
+    Serial.println("starting position set to 1");
+    Xstart = -1;
+    Ystart = -3;
   }else if(startingPosition == 2){
-    X = 0;
-    Y = -3;
+    Xstart = 0;
+    Ystart = -3;
   }else if(startingPosition == 3){
-    X = 1;
-    Y = -3;
+    Xstart = 1;
+    Ystart = -3;
   }
-  OX = X;
-  OY = Y;
+  OX = Xstart;
+  OY = Ystart;
 }
 
 
-void UCmove(int l){
-  while(!UC){
-    forward();
-    UC = detectIntersection();
+void UCmove(int L){
+  while(UC < abs(L)){
+    Serial.println("UC is ");
+    Serial.println(UC);
+    UC = UC + followLine();
     if(!digitalRead(Lbumper) || !digitalRead(Lbumper)){//hits into the wall
         UC++;
     }
@@ -308,51 +312,55 @@ void UCmove(int l){
 }
 
 void pos(int m, int n){ 
-  X1 = m;
-  Y1 = n;
-  X2 = X1 - X;
-  Y2 = Y1 - Y;
-  if(Y2 == 6){
+  Xgoal = m;
+  Ygoal = n;
+  Xpath = Xgoal - Xstart;
+  Ypath = Ygoal - Ystart;
+  if(Ypath == 6){        //if the top row
+    Serial.println("y == 6");
     UCmove(5);
-    if(X1 < 0){
+    if(Xgoal < 0){
         pivot('L',90);
-        UCmove(X2);
+        UCmove(Xpath);
         pivot('R',90);
-    }else if(X1 > 0){
+    }else if(Xgoal > 0){
         pivot('R',90);
-        UCmove(X2);
+        UCmove(Xpath);
         pivot('L',90);
         UCmove(1);
     }
-  }else{
-    UCmove(Y2);
-    if (X1 < 0){
+  }else{              //anything else
+    UCmove(Ypath);
+    Serial.println("y != 6");
+    if (Xgoal < 0){
       pivot('L',90);
-    }else if (X1 > 0){
+    }else if (Xgoal > 0){
       pivot('R',90);
-      UCmove(X2);
     }
+    followLine();
+    Serial.print("Xpath: ");
+    Serial.println(Xpath);
   }
 }
 
 void resetPosition(){ //After each time pick up and drop the object, we need to call this function
   turnAround();
-  if(Y2==6){
-    X = -X1;
-    Y = -Y1;
-    X1 = -OX;
-    Y1 = -OY;
+  if(Ypath==6){
+    Xstart = -Xgoal;
+    Ystart = -Ygoal;
+    Xgoal = -OX;
+    Ygoal = -OY;
   }else{
-    if (X1 < 0){
-        X = -Y1;
-        Y = X1;
-        X1 = -OY;
-        Y1 = OX;
+    if (Xgoal < 0){
+        Xstart = -Ygoal;
+        Ystart = Xgoal;
+        Xgoal = -OY;
+        Ygoal = OX;
     }else{
-        X = Y1;
-        Y = -X1;
-        X1 = OY;
-        Y1 = -OX;
+        Xstart = Ygoal;
+        Ystart = -Xgoal;
+        Xgoal = OY;
+        Ygoal = -OX;
     }
   }
 }
@@ -479,15 +487,15 @@ int bluetoothEmergency(){
     }
   }
   completion = 0;
-  if(!Serial.available()){
-    Serial.println("Serial is unavailable");
-  }
+  /*if(!Serial.available()){
+    Serial.println("Serial is unavailable -bluetooth");
+  }*/
 }
   
   
 //----------------------------------------------SETUP
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);       //115200 for bluetoothM
   
   IRserial.attach(9, -1);
 
@@ -502,15 +510,15 @@ void setup() {
   pinMode(button, INPUT);
 
   //-----------------------
-  //startButton();            //program will not continue until button is pressed
+  startButton();            //program will not continue until button is pressed
   //-----------------------
   
   tilt.attach(12);
   grip.attach(13);
   tilt.write(50);       //the correct height for the arm
   
-  left_speed = 120;               //temporary for troubleshooting
-  right_speed = 120;
+  left_speed = 100;               //temporary for troubleshooting
+  right_speed = 100;
  // left_speed = EEPROM.read(0); //this is how it should be
   //right_speed = EEPROM.read(1);
 }
@@ -518,7 +526,8 @@ void setup() {
 
 //----------------------------------------------LOOP
 void loop() {
-
+  startingPosition = 1;
+  startPosition();
   getBall(1);
      
   
