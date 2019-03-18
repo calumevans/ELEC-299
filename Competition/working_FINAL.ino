@@ -22,8 +22,6 @@ Servo tilt, grip;   //pins 12, 13
 #define sensorL             0
 #define sensorR             1
 #define sensorC             2
-#define range               4
-
 
 //----------------------------------DEFINITIONS
 int ballData[15] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //the corresponding zero to ball# will change once completed
@@ -37,7 +35,6 @@ byte right_speed;
 int inters = 0;
 char grabOrDeposit = 'G';         //global variable which charges based on if robot is grabbing/depositing
 int startingPosition = 0;
-
 int Xstart;
 int Ystart;
 int UC = 0;
@@ -123,8 +120,7 @@ void pivot(char direction, int degrees){            //pivot function
 
 
 //------------------------------------------------------COMPLEX FUNCTIONS
-//----------------------------------------------SEQUENCE
-
+//----------------------------------------------SEQUENCES
 int identifyStartingPosition(){         //left = 1, centre = 2, right = 3
     Serial.print("Identifying starting position...");
     while(startingPosition == 0){                     //constantly checking for character
@@ -147,7 +143,8 @@ int identifyStartingPosition(){         //left = 1, centre = 2, right = 3
   doubleBlink();
   return startingPosition;
 }
-void sequence(int location){                      //the sequence the robot follows
+
+void sequence(int location){                      //sequence based on starting position
   location = identifyStartingPosition();
   Serial.print("Doing sequence #");
   Serial.println(location);
@@ -205,7 +202,7 @@ void depositBall(){
   resetPosition();
 }
 
-void checkWall(){
+void checkWall(){     //depending on the global variable 'grabOrDeposit', a ball will be grabbed or deposited
   if(!digitalRead(Lbumper) || !digitalRead(Rbumper)){
     if(grabOrDeposit == 'G'){          //for grabbing the ball
       grabBall();
@@ -215,12 +212,12 @@ void checkWall(){
   }
 }
 
-void getBall(int ballNum){
+void getBall(int ballNum){        //only ball #1 has coords mapped out so far
   Serial.print("Ball #");
   Serial.print(ballNum);
   Serial.println(" is being captured");  
   grabOrDeposit = 'G';
-  switch(ballNum){            //there are 15 balls in this competition, this is getting the coordinates for the balls and using pos() to travel
+  switch(ballNum){
     case 1:
       pos(-3,-2);
       checkWall();
@@ -278,12 +275,8 @@ ballData[ballNum-1] = 1;          //updates the array to show each ball that is 
 doubleBlink();
 }
 
-
-
-//----------------------------------------------NAVIGATION
-
-
-void startPosition(){
+//----------------------------------------------POSITION
+void startPosition(){         //defining initial coordinates
   if (startingPosition == 1){
     Serial.println("starting position set to 1");
     Xstart = -1;
@@ -299,8 +292,7 @@ void startPosition(){
   OY = Ystart;
 }
 
-
-void UCmove(int L){
+void UCmove(int L){         //for moving 'L' units
   while(UC < abs(L)){
     Serial.println("UC is ");
     Serial.println(UC);
@@ -311,7 +303,7 @@ void UCmove(int L){
   }
 }
 
-void pos(int m, int n){ 
+void pos(int m, int n){     //the main position function
   Xgoal = m;
   Ygoal = n;
   Xpath = Xgoal - Xstart;
@@ -343,7 +335,7 @@ void pos(int m, int n){
   }
 }
 
-void resetPosition(){ //After each time pick up and drop the object, we need to call this function
+void resetPosition(){     //after completing a task, coordinates are reset
   turnAround();
   if(Ypath==6){
     Xstart = -Xgoal;
@@ -365,8 +357,7 @@ void resetPosition(){ //After each time pick up and drop the object, we need to 
   }
 }
 
-
-
+//----------------------------------------------NAVIGATION
 int detectIntersection(){
   if((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH)) {
       Serial.println("Intersection detected!");
@@ -438,7 +429,7 @@ int followLine(){
   }  
 }
 
-void turnAround(){        //used for after the robot hits a wall (grabbing or depositing a ball)
+void turnAround(){   //used for after the robot hits a wall (grabbing or depositing a ball)
   backwards();
   delay(1000);
   pivot('E',180);
@@ -519,16 +510,15 @@ void setup() {
   
   left_speed = 100;               //temporary for troubleshooting
   right_speed = 100;
- // left_speed = EEPROM.read(0); //this is how it should be
+  //left_speed = EEPROM.read(0); //this is how it should be
   //right_speed = EEPROM.read(1);
 }
 
 
 //----------------------------------------------LOOP
-void loop() {
+void loop(){
+  //testing the functions
   startingPosition = 1;
   startPosition();
-  getBall(1);
-     
-  
+  getBall(1);  
 }
