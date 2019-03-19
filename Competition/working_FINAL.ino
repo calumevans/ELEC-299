@@ -64,6 +64,7 @@ void backwards(){
   Serial.println("Backwards");
 }
 
+/*
 void pivot(char direction, int degrees){            //pivot function
   int counter = 0;                                  //this function is VERY dependant on battery charge level
   switch (degrees){
@@ -117,7 +118,56 @@ void pivot(char direction, int degrees){            //pivot function
       break;
   }
 }
+*/
 
+void pivotL(){
+  int counter = 0;
+  while (counter < 9){
+          Serial.println("Pivot left");
+          digitalWrite(Ldirection, LOW);
+          digitalWrite(Rdirection, HIGH);
+          analogWrite(Lspeed, left_speed);
+          analogWrite(Rspeed, right_speed);
+          int LwheelVal = digitalRead(wheelEncoder);
+          counter = counter + LwheelVal;
+          Serial.print("Counter: ");
+          Serial.println(counter);
+ }
+ while (analogRead(sensorL) <= LTHRESH){
+          Serial.println("Pivot left");
+          digitalWrite(Ldirection, LOW);
+          digitalWrite(Rdirection, HIGH);
+          analogWrite(Lspeed, left_speed);
+          analogWrite(Rspeed, right_speed);
+ 
+}
+}
+void pivotR(){
+  int counter = 0;
+  while (counter < 9){
+          Serial.println("Pivot right");
+          digitalWrite(Ldirection, HIGH);
+          digitalWrite(Rdirection, LOW);
+          analogWrite(Lspeed, left_speed);
+          analogWrite(Rspeed, right_speed);
+          int RwheelVal = digitalRead(wheelEncoder);
+          counter = counter + RwheelVal;
+          Serial.print("Counter: ");
+          Serial.println(counter);
+ }
+ while (analogRead(sensorR) <= RTHRESH){
+          Serial.println("Pivot right");
+          digitalWrite(Ldirection, HIGH);
+          digitalWrite(Rdirection, LOW);
+          analogWrite(Lspeed, left_speed);
+          analogWrite(Rspeed, right_speed);
+ }
+}
+void pivotB(){
+  pivotL();
+  pivotL();
+          
+}
 
 //------------------------------------------------------COMPLEX FUNCTIONS
 //----------------------------------------------SEQUENCES
