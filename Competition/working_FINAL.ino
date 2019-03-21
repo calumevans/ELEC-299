@@ -425,7 +425,7 @@ void resetPosition(){     //after completing a task, coordinates are reset
 
 //----------------------------------------------NAVIGATION
 int detectIntersection(){
-  int detected;
+  int detected = 0;
   for(int i=0;i<4;i++){ //checks for intersection 4 times
     if((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH)) {
         detected++;
