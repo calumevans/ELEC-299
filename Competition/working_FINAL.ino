@@ -437,6 +437,7 @@ int detectIntersection(){
         digitalWrite(LED,HIGH);
         delay(200);               //this delay will change with contrast
         digitalWrite(LED,LOW);
+	return 1;
   }
 }
 
