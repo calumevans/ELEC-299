@@ -425,17 +425,15 @@ void resetPosition(){     //after completing a task, coordinates are reset
 
 //----------------------------------------------NAVIGATION
 int detectIntersection(){
-  if((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH)) {
-      Serial.println("Intersection detected!");
-      digitalWrite(LED,HIGH);
-      delay(200);               //this delay will change with contrast
-      stopped();
-      digitalWrite(LED,LOW);
-      delay(2000);
-      forward();
-      delay(300);
-      return 1;
-  } 
+  for(int i=0;i<4;i++){
+    if((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH)) {
+        Serial.println("Intersection detected!");
+        digitalWrite(LED,HIGH);
+        delay(200);               //this delay will change with contrast
+        digitalWrite(LED,LOW);
+        return 1;
+     }
+  }
 }
 
 int followLine(){
