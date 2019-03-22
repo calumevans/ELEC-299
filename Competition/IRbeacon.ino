@@ -11,6 +11,6 @@ void setup(){
 }
 
 void loop(){
-  IRserial.transmit('L');             //change this so L, C, or R
+  IRserial.transmit(1);             //change this so 1,2,3
   delay(100);
 }
