@@ -70,121 +70,43 @@ void pivot(char direction, int degrees){            //pivot function
   switch (degrees){
     case 90:                     //left rotation
       if (direction == 'L'){
-        while (counter < 30){
+        while(analogRead(sensorL) < LTHRESH){
           Serial.println("Pivot left");
           digitalWrite(Ldirection, LOW);
           digitalWrite(Rdirection, HIGH);
           analogWrite(Lspeed, left_speed);
           analogWrite(Rspeed, right_speed);
-          int LwheelVal = digitalRead(wheelEncoder);
-          counter = counter + LwheelVal;
-          Serial.print("Counter: ");
-          Serial.println(counter);
         }
-        counter = 0;
+        delay(250);                                       //to make it turn futher
       } else if (direction == 'R'){      //right rotation
-        Serial.println("Pivot right");
-        while (counter < 104) {
+        while(analogRead(sensorR) < RTHRESH){
           digitalWrite(Ldirection, HIGH);
           digitalWrite(Rdirection, LOW);
           analogWrite(Lspeed, left_speed);
           analogWrite(Rspeed, right_speed);
-          int LwheelVal = digitalRead(wheelEncoder);
-          counter = counter + LwheelVal;
-          //Serial.print("Counter: ");
-          //Serial.println(counter);
         }
-        counter = 0;
+        delay(250);
       } else {
         Serial.println("Invalid direction");
       }
       break;
     case 180:
-      while (counter < 56){
-        Serial.println("Pivot 180");
-        digitalWrite(Ldirection, HIGH);
-        digitalWrite(Rdirection, LOW);
-        analogWrite(Lspeed, left_speed);
-        analogWrite(Rspeed, right_speed);
-        int LwheelVal = digitalRead(wheelEncoder);
-        counter = counter + LwheelVal;
-        Serial.print("Counter: ");
-        Serial.println(counter);
-      }
+      digitalWrite(Ldirection, HIGH);
+      digitalWrite(Rdirection, LOW);
+      analogWrite(Lspeed, left_speed);
+      analogWrite(Rspeed, right_speed);
+      delay(1200);
+      digitalWrite(LED,HIGH);
+      while(analogRead(sensorR) < RTHRESH){
+          digitalWrite(Ldirection, HIGH);
+          digitalWrite(Rdirection, LOW);
+          analogWrite(Lspeed, left_speed);
+          analogWrite(Rspeed, right_speed);
+        }
+    
       break;
   }
 }
-
-
-
-//--------------------------------------NEW PIVOT FUNCTIONS
-/*void pivotL(){
-  int counter = 0;
-  while (counter < 9){
-    Serial.println("Pivot right");
-    digitalWrite(Ldirection, HIGH);
-    digitalWrite(Rdirection, LOW);
-    analogWrite(Lspeed, left_speed);
-    analogWrite(Rspeed, right_speed);
-    int RwheelVal = digitalRead(wheelEncoder);
-    counter = counter + RwheelVal;
-    Serial.print("Counter: ");
-    Serial.println(counter);
-  }
-    
-    while (analogRead(sensorL) <= LTHRESH){
-      Serial.println("Pivot left");
-      digitalWrite(Ldirection, LOW);
-      digitalWrite(Rdirection, HIGH);
-      analogWrite(Lspeed, left_speed);
-      analogWrite(Rspeed, right_speed);
-  
-}
-}
-void pivotR(){
-  int counter = 0;
-  while (counter < 9){
-    Serial.println("Pivot right");
-    digitalWrite(Ldirection, HIGH);
-    digitalWrite(Rdirection, LOW);
-    analogWrite(Lspeed, left_speed);
-    analogWrite(Rspeed, right_speed);
-    int RwheelVal = digitalRead(wheelEncoder);
-    counter = counter + RwheelVal;
-    Serial.print("Counter: ");
-    Serial.println(counter);
-  }
-  while (analogRead(sensorR) <= RTHRESH){
-    Serial.println("Pivot right");
-    digitalWrite(Ldirection, HIGH);
-    digitalWrite(Rdirection, LOW);
-    analogWrite(Lspeed, left_speed);
-    analogWrite(Rspeed, right_speed);
-  }
-}
-
-void pivotB(){
-  int counter = 0;
-  while (counter < 30){
-    Serial.println("Pivot left");
-    digitalWrite(Ldirection, LOW);
-    digitalWrite(Rdirection, HIGH);
-    analogWrite(Lspeed, left_speed);
-    analogWrite(Rspeed, right_speed);
-    int LwheelVal = digitalRead(wheelEncoder);
-    counter = counter + LwheelVal;
-    Serial.print("Counter: ");
-    Serial.println(counter);
-  }
-  while (analogRead(sensorL) <= LTHRESH){
-    Serial.println("Pivot left");
-    digitalWrite(Ldirection, LOW);
-    digitalWrite(Rdirection, HIGH);
-    analogWrite(Lspeed, left_speed);
-    analogWrite(Rspeed, right_speed);
-  }        
-}*/
-
 
 //------------------------------------------------------COMPLEX FUNCTIONS
 //----------------------------------------------SEQUENCES
@@ -194,15 +116,15 @@ int identifyStartingPosition(){         //left = 1, centre = 2, right = 3
       switch(IRserial.receive(200)){
           case 1:
             Serial.println("Left");
-            startingPosition = 1;
+            startingPosition == 1;
             break;
           case 2:
             Serial.println("Center");
-            startingPosition = 2;
+            startingPosition == 2;
             break;
           case 3:
             Serial.println("Right");
-            startingPosition = 3;
+            startingPosition == 3;
             break;
       }
       delay(80);
@@ -215,28 +137,45 @@ void sequence(){                      //sequence based on starting position
   int location = identifyStartingPosition();
   Serial.print("Doing sequence #");
   Serial.println(location);
-  startPosition();
+
   switch(location){
     case 1:             //left robot: 7,1,13,4,6
-      getBall(7);    
-      getBall(1);
-      getBall(13);
-      getBall(4);
-      getBall(6);
+     //ball 7
+      UCmove(10);
+      doubleBlink();
+
+      //ball 1
+      pivot('L',90);
+      UCmove(2);
+      pivot('R',90);
+      
+      //ball 13
+      UCmove(3);
+      pivot('R',90);
+      UCmove(6);
+      pivot('L',90);
+
+      //ball 4
+      UCmove(5);
+      pivot('L',90);
+      UCmove(2);
+      pivot('R',90);
+      UCmove(4);
+
+      //ball 6
+      pivot('L',90);
+      UCmove(1);
+      pivot('R',90);
+      UCmove(8);
+      pivot('L',90);
+      UCmove(1);
+      pivot('R',90);
       break;  
     case 2:             //centre robot: 8,2,14,5,11
-      getBall(8);
-      getBall(2);
-      getBall(14);
-      getBall(5);
-      getBall(11);
+     
       break;
     case 3:             //right robot: 9,3,15,10,12
-      getBall(9);
-      getBall(3);
-      getBall(15);
-      getBall(10);
-      getBall(12);
+     
       break;      
   }
   Serial.print("Finished sequence!");
@@ -255,7 +194,7 @@ void grabBall(){
   }
   tilt.write(170);
   delay(1500);
-  resetPosition();
+
 }
 
 void depositBall(){
@@ -267,27 +206,20 @@ void depositBall(){
   tilt.write(50);
   delay(100);
   tilt.write(170);
-  resetPosition();
-  /*for(int i=180;i>89;i--){
-    //Serial.println(i);
-    grip.write(i);
-    delay(50);
-  }
-  delay(3000);
-  resetPosition();
-  */
-}
 
+}
 
 void checkWall(){     //depending on the global variable 'grabOrDeposit', a ball will be grabbed or deposited
   if(!digitalRead(Lbumper) || !digitalRead(Rbumper)){
     stopped();
     if(grabOrDeposit == 'G'){          //for grabbing the ball
       backwards();
-      delay(400);
+      delay(300);
       grabBall();
+      turnAround();
     }else if(grabOrDeposit == 'D'){    //for depositing the ball
       depositBall();
+      turnAround();
     }
     if(grabOrDeposit == 'G'){          //for grabbing the ball
       grabOrDeposit = 'D';
@@ -297,312 +229,65 @@ void checkWall(){     //depending on the global variable 'grabOrDeposit', a ball
   }
 }
 
-
-void getBall(int ballNum){        //only ball #1 has coords mapped out so far
-  Serial.print("Ball #");
-  Serial.print(ballNum);
-  Serial.println(" is being captured");  
-  grabOrDeposit = 'G';
-  switch(ballNum){
-    case 1:
-      UCmove(1);
-      pivot('L',90);
-      UCmove(2);
-      doubleBlink();
-      pivot('R',90);
-      doubleBlink();
-      straight();
-      break;
-    case 2:
-      pos(-3,-1);
-      break;
-    case 3:
-      pos(-3,0);
-      break;
-    case 4:
-      pos(-3,1);
-      break;
-    case 5:
-      pos(-3,2);
-      break;
-    case 6:
-      pos(-2,3);
-      break;
-    case 7:
-      grabOrDeposit = 'G';
-      straight();
-      turnAround();
-      straight();
-      turnAround();
-      break;
-    case 8:
-      grabOrDeposit = 'G';
-      straight();
-      turnAround();
-      straight();
-      turnAround();
-      break;
-    case 9:
-      grabOrDeposit = 'G';
-      straight();
-      turnAround();
-      straight();
-      turnAround();
-      break;
-    case 10:
-      pos(2,3);
-      break;
-    case 11:
-      pos(3,2);
-      break;
-    case 12:
-      pos(3,1);
-      break;
-    case 13:
-      pos(3,0);
-      break;
-    case 14:
-      pos(3,-1);
-      break;
-    case 15:
-      pos(3,-2);
-      break;
-    default:
-      Serial.println("Invalid ball number");
-      break;
-  }
-ballData[ballNum-1] = 1;          //updates the array to show each ball that is captured (denoted with a 1)
-doubleBlink();
-}
-
 //----------------------------------------------POSITION
-void startPosition(){         //defining initial coordinates
-  if (startingPosition == 1){
-    Serial.println("starting position set to 1");
-    Xstart = -1;
-    Ystart = -3;
-  }else if(startingPosition == 2){
-    Xstart = 0;
-    Ystart = -3;
-  }else if(startingPosition == 3){
-    Xstart = 1;
-    Ystart = -3;
-  }
-  OX = Xstart;
-  OY = Ystart;
-}
 
 void UCmove(int L){  //for moving 'L' units
   int UC =0;
-  while(UC < abs(L)){
-    Serial.println("UC is ");
-    Serial.println(UC);
+  while(UC < L){
+   // Serial.println("UC is ");
+    //Serial.println(UC);
     UC = UC + followLine();
-    if(!digitalRead(Lbumper) || !digitalRead(Lbumper)){//hits into the wall
-        UC++;
-    }
-  }
-}
-
-void pos(int m, int n){     //the main position function
-  Xgoal = m;
-  Ygoal = n;
-  Xpath = Xgoal - Xstart;
-  Ypath = Ygoal - Ystart;
-  if(Ypath == 6){        //if the top row
-    Serial.println("y == 6");
-    UCmove(5);
-    if(Xgoal < 0){
-        pivot('L',90);
-        UCmove(Xpath);
-        pivot('R',90);
-    }else if(Xgoal > 0){
-        pivot('R',90);
-        UCmove(Xpath);
-        pivot('L',90);
-        UCmove(1);
-    }
-  }else{              //anything else
-    UCmove(Ypath);
-    Serial.println("y != 6");
-    if (Xgoal < 0){
-      pivot('L',90);
-    }else if (Xgoal > 0){
-      pivot('R',90);
-    }
-    UCmove(Xpath);
-    Serial.print("Xpath: ");
-    Serial.println(Xpath);
-  }
-}
-
-void resetPosition(){     //after completing a task, coordinates are reset
-  turnAround();
-  if(Ypath==6){
-    Xstart = -Xgoal;
-    Ystart = -Ygoal;
-    Xgoal = -OX;
-    Ygoal = -OY;
-  }else{
-    if (Xgoal < 0){
-        Xstart = -Ygoal;
-        Ystart = Xgoal;
-        Xgoal = -OY;
-        Ygoal = OX;
-    }else{
-        Xstart = Ygoal;
-        Ystart = -Xgoal;
-        Xgoal = OY;
-        Ygoal = -OX;
-    }
   }
 }
 
 //----------------------------------------------NAVIGATION
 int detectIntersection(){
-  /*if(((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH))) {
-      Serial.println("Intersection detected!");
-      digitalWrite(LED,HIGH);
-      delay(200);               //this delay will change with contrast
-      forward();
-      delay(500);
-      stopped();
-      digitalWrite(LED,LOW);
-      delay(2000);
-      //forward();
-      //delay(500);
-      return 1;
-  } */
-  for(int i=0;i<4;i++){
     if((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH)) {
         Serial.println("Intersection detected!");
         digitalWrite(LED,HIGH);
-        delay(200);               //this delay will change with contrast
-        forward();
-        delay(500);
-        stopped();
+        delay(350);               //this delay will change with contrast
+
+        //stopped();
         digitalWrite(LED,LOW);
-        delay(1000);
+        //delay(1000);
         return 1;
-        break;
-     }
+     }else{
+        return 0;
   }
 }
 
 int followLine(){
-  while(1){
+  Serial.println(detectIntersection());
+  while(!detectIntersection()){
     checkWall(); 
-    delay(400);
-    while(analogRead(sensorR) > RTHRESH){     //veering left
-      Serial.println("veering left loop");
-      Serial.print("Left/Centre/Right:  ");
-      Serial.print(analogRead(sensorL));
-      Serial.print(", ");
-      Serial.print(analogRead(sensorC));
-      Serial.print(", ");
-      Serial.println(analogRead(sensorR));
-      
-      digitalWrite(Ldirection, HIGH);
-      digitalWrite(Rdirection, HIGH);
-      analogWrite(Lspeed, left_speed);
+    if(analogRead(sensorR) > RTHRESH){     //veering left
+      Serial.println("veering left");
+      analogWrite(Lspeed, left_speed);      
       analogWrite(Rspeed, 0);
-      inters = detectIntersection();       //if Bluetooth emergency will be 1 if missed an intersection
-      if(inters == 1){ 
-        inters = 0;
-        return 1;
-        break;
-      }
       checkWall();
-    }
-
-    while(analogRead(sensorL) > LTHRESH){     //veering right
-      Serial.println("veering right loop");
-      Serial.print("Left/Centre/Right:  ");
-      Serial.print(analogRead(sensorL));
-      Serial.print(", ");
-      Serial.print(analogRead(sensorC));
-      Serial.print(", ");
-      Serial.println(analogRead(sensorR));
-      
-      digitalWrite(Ldirection, HIGH);
-      digitalWrite(Rdirection, HIGH);
+    }else if(analogRead(sensorL) > LTHRESH){     //veering right
+      Serial.println("veering right");
       analogWrite(Lspeed, 0);
       analogWrite(Rspeed, right_speed);
-      inters = detectIntersection();
-      if(inters == 1){
-        inters = 0;
-        return 1;
-        break;
-      }
       checkWall();
-    }
-     int inters = detectIntersection();
-     if(inters == 1){
-        inters = 0;
-        return 1;
-        break;
-     }
-     forward();
-  }  
-}
-
-int straight(){
-  while(1){
-    checkWall(); 
-    delay(400);
-    while(analogRead(sensorR) > RTHRESH){     //veering left
-      Serial.println("veering left loop");
-      Serial.print("Left/Centre/Right:  ");
-      Serial.print(analogRead(sensorL));
-      Serial.print(", ");
-      Serial.print(analogRead(sensorC));
-      Serial.print(", ");
-      Serial.println(analogRead(sensorR));
-      
-      digitalWrite(Ldirection, HIGH);
-      digitalWrite(Rdirection, HIGH);
-      analogWrite(Lspeed, left_speed);
-      analogWrite(Rspeed, 0);
-      
-      checkWall();
-    }
-
-    while(analogRead(sensorL) > LTHRESH){     //veering right
-      Serial.println("veering right loop");
-      Serial.print("Left/Centre/Right:  ");
-      Serial.print(analogRead(sensorL));
-      Serial.print(", ");
-      Serial.print(analogRead(sensorC));
-      Serial.print(", ");
-      Serial.println(analogRead(sensorR));
-      
-      digitalWrite(Ldirection, HIGH);
-      digitalWrite(Rdirection, HIGH);
-      analogWrite(Lspeed, 0);
-      analogWrite(Rspeed, right_speed);
-      
-      checkWall();
-    }
-    while((analogRead(sensorL) > LTHRESH) && (analogRead(sensorR) > RTHRESH)){
+    }else{
+      Serial.println("perfectly on line");
       forward();
     }
-     
-     forward();
-  }  
+    Serial.println("forward outside of loop");
+    forward();
+  }
+  return 1;       //when there is intersection
 }
+
 
 void turnAround(){   //used for after the robot hits a wall (grabbing or depositing a ball)
   backwards();
-  delay(1000);
+  delay(900);
   pivot('L',180);
 }
 
 //----------------------------------------------MISCELLANEOUS
-void startButton(){
-  Serial.println("Waiting for start button");
-  while(digitalRead(button)){}                  //stuck in a loop until button is pressed
-  Serial.println("Start button pressed!");
-}
 
 void doubleBlink(){               //used to denote that things happen during the competition
   for(int i=0;i<2;i++){
@@ -640,9 +325,6 @@ int bluetoothEmergency(){
     }
   }
   completion = 0;
-  /*if(!Serial.available()){
-    Serial.println("Serial is unavailable -bluetooth");
-  }*/
 }
   
   
@@ -662,16 +344,12 @@ void setup() {
   pinMode(LED, OUTPUT);     //this LED will turn on when an intersection has been detected, and when a sequence is completed
   pinMode(button, INPUT);
 
-  //-----------------------
-  //startButton();            //program will not continue until button is pressed
-  //-----------------------
-  
   tilt.attach(12);
   grip.attach(13);
   tilt.write(170);       //the correct height for the arm
   
-  left_speed = 95;               //temporary for troubleshooting
-  right_speed = 96;
+  left_speed = 110;               //temporary for troubleshooting
+  right_speed = 111;
   //left_speed = EEPROM.read(0); //this is how it should be
   //right_speed = EEPROM.read(1);
 }
@@ -680,7 +358,8 @@ void setup() {
 //----------------------------------------------LOOP
 void loop(){
   //This is the code for the competition
+ // sequence();
+  //while(1) Serial.println("done");
+  startingPosition = 1;
   sequence();
-  while(1) Serial.println("done");
-  
 }
