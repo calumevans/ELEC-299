@@ -13,7 +13,7 @@ QSerial IRserial;
 #define Rdirection          7
 #define button              8
 #define IRreciever          9
-#define wheelEncoder        10
+//#define something         10
 #define LED                 11
 
 Servo tilt, grip;   //pins 12, 13
@@ -24,7 +24,6 @@ Servo tilt, grip;   //pins 12, 13
 #define sensorC             2
 
 //----------------------------------DEFINITIONS
-int ballData[15] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //the corresponding zero to ball# will change once completed
 #define LTHRESH 850
 #define CTHRESH 850
 #define RTHRESH 850
@@ -32,14 +31,8 @@ int ballData[15] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //the correspo
 byte left_speed;                    //speed stored on each robot for going straight
 byte right_speed;
 
-int inters = 0;
 char grabOrDeposit = 'G';         //global variable which charges based on if robot is grabbing/depositing
 int startingPosition = 0;
-int Xstart;
-int Ystart;
-//int UC = 0;
-int OX,OY;
-int Xgoal,Ygoal,Xpath,Ypath;
 
 //------------------------------------------------------BASIC FUNCTIONS
 void forward(){
@@ -64,9 +57,8 @@ void backwards(){
   Serial.println("Backwards");
 }
 
-//*      OLD PIVOT FUNCTION
+//      OLD PIVOT FUNCTION
 void pivot(char direction, int degrees){            //pivot function
-  int counter = 0;                                  //this function is VERY dependant on battery charge level
   switch (degrees){
     case 90:                     //left rotation
       if (direction == 'L'){
@@ -77,7 +69,7 @@ void pivot(char direction, int degrees){            //pivot function
           analogWrite(Lspeed, left_speed);
           analogWrite(Rspeed, right_speed);
         }
-        delay(250);                                       //to make it turn futher
+        delay(250);                                            //to make it turn futher
       } else if (direction == 'R'){      //right rotation
         while(analogRead(sensorR) < RTHRESH){
           digitalWrite(Ldirection, HIGH);
@@ -85,7 +77,7 @@ void pivot(char direction, int degrees){            //pivot function
           analogWrite(Lspeed, left_speed);
           analogWrite(Rspeed, right_speed);
         }
-        delay(250);
+        delay(250);                                            //to make it turn futher
       } else {
         Serial.println("Invalid direction");
       }
@@ -95,15 +87,14 @@ void pivot(char direction, int degrees){            //pivot function
       digitalWrite(Rdirection, LOW);
       analogWrite(Lspeed, left_speed);
       analogWrite(Rspeed, right_speed);
-      delay(1200);
+      delay(1200);                                           //to make it turn futher, battery level dependant
       digitalWrite(LED,HIGH);
       while(analogRead(sensorR) < RTHRESH){
-          digitalWrite(Ldirection, HIGH);
-          digitalWrite(Rdirection, LOW);
-          analogWrite(Lspeed, left_speed);
-          analogWrite(Rspeed, right_speed);
-        }
-    
+        digitalWrite(Ldirection, HIGH);
+        digitalWrite(Rdirection, LOW);
+        analogWrite(Lspeed, left_speed);
+        analogWrite(Rspeed, right_speed);
+      }
       break;
   }
 }
@@ -116,15 +107,15 @@ int identifyStartingPosition(){         //left = 1, centre = 2, right = 3
       switch(IRserial.receive(200)){
           case 1:
             Serial.println("Left");
-            startingPosition == 1;
+            startingPosition = 1;
             break;
           case 2:
             Serial.println("Center");
-            startingPosition == 2;
+            startingPosition = 2;
             break;
           case 3:
             Serial.println("Right");
-            startingPosition == 3;
+            startingPosition = 3;
             break;
       }
       delay(80);
@@ -158,7 +149,7 @@ void sequence(){                      //sequence based on starting position
       //ball 4
       UCmove(5);
       pivot('L',90);
-      UCmove(2);
+      UCmove(3);                          //changed from 2 to 3 right?
       pivot('R',90);
       UCmove(4);
 
@@ -179,9 +170,7 @@ void sequence(){                      //sequence based on starting position
       break;      
   }
   Serial.print("Finished sequence!");
-//  Serial.println(ballData);
 }
-
 
 //----------------------------------------------BALLS
 void grabBall(){
@@ -194,7 +183,6 @@ void grabBall(){
   }
   tilt.write(170);
   delay(1500);
-
 }
 
 void depositBall(){
@@ -206,7 +194,6 @@ void depositBall(){
   tilt.write(50);
   delay(100);
   tilt.write(170);
-
 }
 
 void checkWall(){     //depending on the global variable 'grabOrDeposit', a ball will be grabbed or deposited
@@ -221,35 +208,28 @@ void checkWall(){     //depending on the global variable 'grabOrDeposit', a ball
       depositBall();
       turnAround();
     }
-    if(grabOrDeposit == 'G'){          //for grabbing the ball
+    if(grabOrDeposit == 'G'){          //to toggle between grabbing and depositing
       grabOrDeposit = 'D';
-    }else{    //for depositing the ball
+    }else{ 
       grabOrDeposit = 'G';
     }
   }
 }
 
-//----------------------------------------------POSITION
-
+//----------------------------------------------NAVIGATION
 void UCmove(int L){  //for moving 'L' units
-  int UC =0;
+  int UC = 0;
   while(UC < L){
-   // Serial.println("UC is ");
-    //Serial.println(UC);
     UC = UC + followLine();
   }
 }
 
-//----------------------------------------------NAVIGATION
 int detectIntersection(){
     if((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH)) {
         Serial.println("Intersection detected!");
         digitalWrite(LED,HIGH);
-        delay(350);               //this delay will change with contrast
-
-        //stopped();
+        delay(350);                                 //how far past the intersection we want it to go
         digitalWrite(LED,LOW);
-        //delay(1000);
         return 1;
      }else{
         return 0;
@@ -280,16 +260,14 @@ int followLine(){
   return 1;       //when there is intersection
 }
 
-
 void turnAround(){   //used for after the robot hits a wall (grabbing or depositing a ball)
   backwards();
-  delay(900);
-  pivot('L',180);
+  delay(900);             //how far back from the wall
+  pivot('E',180);
 }
 
 //----------------------------------------------MISCELLANEOUS
-
-void doubleBlink(){               //used to denote that things happen during the competition
+void doubleBlink(){               //used to show that things happen
   for(int i=0;i<2;i++){
     digitalWrite(LED,HIGH);
     delay(50);
@@ -307,19 +285,10 @@ int bluetoothEmergency(){
     Serial.println(code);
     
     switch(code){
-      case 72:            //pressed H, make the robot go back to home base
-        Serial.println("Going back to home base");
-        //pos(0,0);
-        Serial.println("Now at home base");
-        completion++;
-        break;
-      case 66:            //pressed B, make the robot go to bin and deposit ball
-        //pos(3,-1);     //the position of the bin
-        depositBall();
-        completion++;
-        break;
-      case 73:            //pressed I, mark that the robot passed an intersection
-        return 1;
+      case 83:            //pressed S, make the robot stop for 3 seconds
+        Serial.println("EMERGENCY STOP: 3 seconds");
+        stopped();
+        delay(3000);
         completion++;
         break;
     }
@@ -340,7 +309,6 @@ void setup() {
   pinMode(Ldirection, OUTPUT);
   pinMode(Rspeed, OUTPUT);
   pinMode(Rdirection, OUTPUT);
-  pinMode(wheelEncoder, INPUT);
   pinMode(LED, OUTPUT);     //this LED will turn on when an intersection has been detected, and when a sequence is completed
   pinMode(button, INPUT);
 
@@ -354,12 +322,13 @@ void setup() {
   //right_speed = EEPROM.read(1);
 }
 
-
 //----------------------------------------------LOOP
 void loop(){
+  /*
   //This is the code for the competition
- // sequence();
-  //while(1) Serial.println("done");
+  sequence();
+  while(1) Serial.println("done");
+  */
   startingPosition = 1;
   sequence();
 }
