@@ -70,7 +70,7 @@ void pivot(char direction, int degrees){            //pivot function
   switch (degrees){
     case 90:                     //left rotation
       if (direction == 'L'){
-        while (counter < 20){
+        while (counter < 30){
           Serial.println("Pivot left");
           digitalWrite(Ldirection, LOW);
           digitalWrite(Rdirection, HIGH);
@@ -84,7 +84,7 @@ void pivot(char direction, int degrees){            //pivot function
         counter = 0;
       } else if (direction == 'R'){      //right rotation
         Serial.println("Pivot right");
-        while (counter < 25000) {
+        while (counter < 104) {
           digitalWrite(Ldirection, HIGH);
           digitalWrite(Rdirection, LOW);
           analogWrite(Lspeed, left_speed);
@@ -100,7 +100,7 @@ void pivot(char direction, int degrees){            //pivot function
       }
       break;
     case 180:
-      while (counter < 39){
+      while (counter < 56){
         Serial.println("Pivot 180");
         digitalWrite(Ldirection, HIGH);
         digitalWrite(Rdirection, LOW);
@@ -305,11 +305,13 @@ void getBall(int ballNum){        //only ball #1 has coords mapped out so far
   grabOrDeposit = 'G';
   switch(ballNum){
     case 1:
-      pos(-3,-2);
-      checkWall();
-      grabOrDeposit = 'D';
-      pos(Xgoal,Ygoal);   //go to bin
-      checkWall();
+      UCmove(1);
+      pivot('L',90);
+      UCmove(2);
+      doubleBlink();
+      pivot('R',90);
+      doubleBlink();
+      straight();
       break;
     case 2:
       pos(-3,-1);
@@ -458,17 +460,33 @@ void resetPosition(){     //after completing a task, coordinates are reset
 
 //----------------------------------------------NAVIGATION
 int detectIntersection(){
-  if(((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH))) {
+  /*if(((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH))) {
       Serial.println("Intersection detected!");
       digitalWrite(LED,HIGH);
       delay(200);               //this delay will change with contrast
+      forward();
+      delay(500);
       stopped();
       digitalWrite(LED,LOW);
       delay(2000);
-      forward();
-      delay(500);
+      //forward();
+      //delay(500);
       return 1;
-  } 
+  } */
+  for(int i=0;i<4;i++){
+    if((analogRead(sensorL) > LTHRESH) && (analogRead(sensorC) > CTHRESH) && (analogRead(sensorR) > RTHRESH)) {
+        Serial.println("Intersection detected!");
+        digitalWrite(LED,HIGH);
+        delay(200);               //this delay will change with contrast
+        forward();
+        delay(500);
+        stopped();
+        digitalWrite(LED,LOW);
+        delay(1000);
+        return 1;
+        break;
+     }
+  }
 }
 
 int followLine(){
@@ -652,8 +670,8 @@ void setup() {
   grip.attach(13);
   tilt.write(170);       //the correct height for the arm
   
-  left_speed = 104;               //temporary for troubleshooting
-  right_speed = 105;
+  left_speed = 95;               //temporary for troubleshooting
+  right_speed = 96;
   //left_speed = EEPROM.read(0); //this is how it should be
   //right_speed = EEPROM.read(1);
 }
@@ -661,30 +679,8 @@ void setup() {
 
 //----------------------------------------------LOOP
 void loop(){
-  /*
   //This is the code for the competition
   sequence();
   while(1) Serial.println("done");
-  */
-  Xstart = -3;
-  Ystart = -2;
-  pos(2,1);
-  stopped;
-  delay(30000);
-  //pivot('R', 90);
-  //stopped();
-  //delay(3000);
-
-  //Serial.println(digitalRead(2));
-  //Serial.println(digitalRead(3));
-  //startingPosition = 1;
-  //startPosition();
-  //getBall(1);
- 
- 
-  //for testing:
-  //startingPosition = 1;       //in the competition this is done with the IR reciever
-  //getBall(1);
-  
   
 }
