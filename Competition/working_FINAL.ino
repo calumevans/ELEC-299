@@ -28,9 +28,8 @@ Servo tilt, grip;   //pins 12, 13
 #define CTHRESH 850
 #define RTHRESH 850
 
-byte left_speed;
-byte right_speed;
-
+byte left_speed = 110;
+byte right_speed = 111;
 char grabOrDeposit = 'G';         //global variable which charges based on if robot is grabbing/depositing
 int startingPosition = 0;
 
@@ -355,13 +354,11 @@ int bluetoothEmergency(){
   completion = 0;
 }
   
-  
 //----------------------------------------------SETUP
 void setup() {
   Serial.begin(9600);       //115200 for bluetoothM
-  
+ 
   IRserial.attach(9, -1);
-
   pinMode(Lbumper, INPUT);
   pinMode(Rbumper, INPUT);
   pinMode(Lspeed, OUTPUT);
@@ -374,11 +371,6 @@ void setup() {
   tilt.attach(12);
   grip.attach(13);
   tilt.write(170);       //the correct height for the arm
-  
-  left_speed = 110;               //temporary for troubleshooting
-  right_speed = 111;
-  //left_speed = EEPROM.read(0); //this is how it should be
-  //right_speed = EEPROM.read(1);
 }
 
 //----------------------------------------------LOOP
