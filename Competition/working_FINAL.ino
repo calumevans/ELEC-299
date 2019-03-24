@@ -13,8 +13,8 @@ QSerial IRserial;
 #define Rdirection          7
 #define button              8
 #define IRreciever          9
-//#define something         10
-#define LED                 11
+#define LED                 10
+//#define something         11
 
 Servo tilt, grip;   //pins 12, 13
 
@@ -67,7 +67,7 @@ void pivot(char direction, int degrees){            //UPDATED pivot function
           analogWrite(Lspeed, left_speed);
           analogWrite(Rspeed, right_speed);
         }
-        delay(250);                                            //to make it turn futher
+        delay(190);                                            //to make it turn futher
       } else if (direction == 'R'){      //right rotation
         while(analogRead(sensorR) < RTHRESH){
           digitalWrite(Ldirection, HIGH);
@@ -85,7 +85,7 @@ void pivot(char direction, int degrees){            //UPDATED pivot function
       digitalWrite(Rdirection, LOW);
       analogWrite(Lspeed, left_speed);
       analogWrite(Rspeed, right_speed);
-      delay(1200);                                           //to make it turn futher, battery level dependant
+      delay(1400);                                           //to make it turn futher, battery level dependant
       digitalWrite(LED,HIGH);
       while(analogRead(sensorR) < RTHRESH){
         digitalWrite(Ldirection, HIGH);
@@ -234,13 +234,12 @@ void sequence(){                      //sequence based on starting position
 void grabBall(){
   stopped();
   tilt.write(46);
-  for(int i=90;i<180;i++){
-    //Serial.println(i);
+  for(int i=40;i<180;i++){
     grip.write(i);
-    delay(50);
+    delay(35);
   }
   tilt.write(170);
-  delay(1500);
+  delay(500);
 }
 
 void depositBall(){
@@ -296,6 +295,7 @@ int detectIntersection(){
 
 int followLine(){
   Serial.println(detectIntersection());
+  bluetoothEmergency();
   while(!detectIntersection()){
     checkWall(); 
     if(analogRead(sensorR) > RTHRESH){     //veering left
@@ -334,13 +334,13 @@ void doubleBlink(){               //used to show that things happen
   }
 }
 
-int bluetoothEmergency(){
+void bluetoothEmergency(){
   //for EPBMX, the serial.begin must be changed to "115200"
   int completion = 0;
   while(Serial.available() && (completion == 0)){         //completion goes to 1 when a task is completed
     int code = Serial.read();
     Serial.print("BT Number Recieved: ");
-    Serial.println(code);
+    Serial.println(int(code));
     
     switch(code){
       case 83:            //pressed S, make the robot stop for 3 seconds
@@ -349,6 +349,23 @@ int bluetoothEmergency(){
         delay(3000);
         completion++;
         break;
+      case 76:            //pressed L, make the robot swerve left
+        Serial.println("EMERGENCY: swerve left");
+        digitalWrite(Rdirection, HIGH);
+        analogWrite(Lspeed,0);
+        analogWrite(Rspeed, right_speed);
+        delay(500);
+        completion++;
+        break;
+      case 82:            //pressed R, make the robot swerve right
+        Serial.println("EMERGENCY: swerve right");
+        digitalWrite(Ldirection, HIGH);
+        analogWrite(Rspeed,0);
+        analogWrite(Lspeed, left_speed);
+        delay(500);
+        completion++;
+        break;
+        
     }
   }
   completion = 0;
@@ -356,7 +373,7 @@ int bluetoothEmergency(){
   
 //----------------------------------------------SETUP
 void setup() {
-  Serial.begin(9600);       //115200 for bluetoothM
+  Serial.begin(115200);       //115200 for bluetoothM
  
   IRserial.attach(9, -1);
   pinMode(Lbumper, INPUT);
@@ -380,6 +397,6 @@ void loop(){
   sequence();
   while(1) Serial.println("done");
   */
-  startingPosition = 1;
+  startingPosition = 2;
   sequence();
 }
