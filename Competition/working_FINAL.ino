@@ -28,7 +28,7 @@ Servo tilt, grip;   //pins 12, 13
 #define CTHRESH 850
 #define RTHRESH 850
 
-byte left_speed;                    //speed stored on each robot for going straight
+byte left_speed;
 byte right_speed;
 
 char grabOrDeposit = 'G';         //global variable which charges based on if robot is grabbing/depositing
@@ -46,7 +46,7 @@ void forward(){
 void stopped(){
   analogWrite(Lspeed, 0);
   analogWrite(Rspeed, 0);
-    Serial.println("Stopped");
+  Serial.println("Stopped");
 }
 
 void backwards(){
@@ -57,8 +57,7 @@ void backwards(){
   Serial.println("Backwards");
 }
 
-//      OLD PIVOT FUNCTION
-void pivot(char direction, int degrees){            //pivot function
+void pivot(char direction, int degrees){            //UPDATED pivot function
   switch (degrees){
     case 90:                     //left rotation
       if (direction == 'L'){
@@ -128,7 +127,6 @@ void sequence(){                      //sequence based on starting position
   int location = identifyStartingPosition();
   Serial.print("Doing sequence #");
   Serial.println(location);
-
   switch(location){
     case 1:             //left robot: 7,1,13,4,6
      //ball 7
@@ -147,9 +145,9 @@ void sequence(){                      //sequence based on starting position
       pivot('L',90);
 
       //ball 4
-      UCmove(5);
+      UCmove(6);
       pivot('L',90);
-      UCmove(3);                          //changed from 2 to 3 right?
+      UCmove(2);
       pivot('R',90);
       UCmove(4);
 
@@ -161,15 +159,76 @@ void sequence(){                      //sequence based on starting position
       pivot('L',90);
       UCmove(1);
       pivot('R',90);
+      UCmove(1);        //ends on the first intersection
+      stopped();
+      delay(1000000);   //just stop
       break;  
     case 2:             //centre robot: 8,2,14,5,11
-     
+      //ball 8
+      UCmove(11);
+      
+      //ball 2
+      pivot('L',90);
+      UCmove(4);
+      pivot('R',90);
+      UCmove(3);
+      
+      //ball 14
+      pivot('R',90);
+      UCmove(4);
+      pivot('L',90);
+      UCmove(6);
+      
+      //ball 5
+      pivot('L',90);
+      UCmove(4);
+      pivot('R',90);
+      UCmove(9);
+      
+      //ball 11
+      pivot('R',90);
+      UCmove(4);
+      pivot('L',90);
+      UCmove(5);
+      stopped();
+      delay(1000000);   //just stop
       break;
     case 3:             //right robot: 9,3,15,10,12
-     
+      //ball 9
+      UCmove(12);
+      
+      //ball 3
+      pivot('L',90);
+      UCmove(6);
+      pivot('R',90);
+      UCmove(3);
+      
+      //ball 15
+      pivot('R',90);
+      UCmove(2);
+      pivot('L',90);
+      UCmove(1);
+      
+      //ball 10
+      pivot('R',90);
+      UCmove(1);
+      pivot('L',90);
+      UCmove(8);
+      pivot('R',90);
+      UCmove(1);
+      pivot('L',90);
+      UCmove(4);
+      
+      //ball 12
+      pivot('R',90);
+      UCmove(2);
+      pivot('L',90);
+      UCmove(4);
+      stopped();
+      delay(1000000);   //just stop
       break;      
   }
-  Serial.print("Finished sequence!");
+  Serial.print("Finished!!!!");
 }
 
 //----------------------------------------------BALLS
