@@ -28,10 +28,10 @@ Servo tilt, grip;   //pins 12, 13
 #define CTHRESH 850
 #define RTHRESH 850
 
-byte left_speed = 110;
-byte right_speed = 111;
+byte left_speed = 109;
+byte right_speed = 110;
 char grabOrDeposit = 'G';         //global variable which charges based on if robot is grabbing/depositing
-int startingPosition = 0;
+char startingPosition = '9';
 
 //------------------------------------------------------BASIC FUNCTIONS
 void forward(){
@@ -60,8 +60,13 @@ void pivot(char direction, int degrees){            //UPDATED pivot function
   switch (degrees){
     case 90:                     //left rotation
       if (direction == 'L'){
-        while(analogRead(sensorL) < LTHRESH){
           Serial.println("Pivot left");
+          digitalWrite(Ldirection, LOW);
+          digitalWrite(Rdirection, HIGH);
+          analogWrite(Lspeed, left_speed);
+          analogWrite(Rspeed, right_speed);
+          delay(250);
+        while(analogRead(sensorL) < LTHRESH){
           digitalWrite(Ldirection, LOW);
           digitalWrite(Rdirection, HIGH);
           analogWrite(Lspeed, left_speed);
@@ -69,8 +74,13 @@ void pivot(char direction, int degrees){            //UPDATED pivot function
         }
         delay(190);                                            //to make it turn futher
       } else if (direction == 'R'){      //right rotation
-        while(analogRead(sensorR) < RTHRESH){
           digitalWrite(Ldirection, HIGH);
+          digitalWrite(Rdirection, LOW);
+          analogWrite(Lspeed, left_speed);
+          analogWrite(Rspeed, right_speed);
+          delay(250);
+        while(analogRead(sensorR) < RTHRESH){
+        digitalWrite(Ldirection, HIGH);
           digitalWrite(Rdirection, LOW);
           analogWrite(Lspeed, left_speed);
           analogWrite(Rspeed, right_speed);
@@ -86,7 +96,6 @@ void pivot(char direction, int degrees){            //UPDATED pivot function
       analogWrite(Lspeed, left_speed);
       analogWrite(Rspeed, right_speed);
       delay(1400);                                           //to make it turn futher, battery level dependant
-      digitalWrite(LED,HIGH);
       while(analogRead(sensorR) < RTHRESH){
         digitalWrite(Ldirection, HIGH);
         digitalWrite(Rdirection, LOW);
@@ -99,21 +108,21 @@ void pivot(char direction, int degrees){            //UPDATED pivot function
 
 //------------------------------------------------------COMPLEX FUNCTIONS
 //----------------------------------------------SEQUENCES
-int identifyStartingPosition(){         //left = 1, centre = 2, right = 3
+char identifyStartingPosition(){         //left = 1, centre = 2, right = 3
     Serial.print("Identifying starting position...");
-    while(startingPosition == 0){                     //constantly checking for character
+    while(startingPosition == '9'){                     //constantly checking for character
       switch(IRserial.receive(200)){
-          case 1:
+          case '0':
             Serial.println("Left");
-            startingPosition = 1;
+            startingPosition = '0';
             break;
-          case 2:
+          case '1':
             Serial.println("Center");
-            startingPosition = 2;
+            startingPosition = '1';
             break;
-          case 3:
+          case '2':
             Serial.println("Right");
-            startingPosition = 3;
+            startingPosition = '2';
             break;
       }
       delay(80);
@@ -123,108 +132,161 @@ int identifyStartingPosition(){         //left = 1, centre = 2, right = 3
 }
 
 void sequence(){                      //sequence based on starting position
-  int location = identifyStartingPosition();
+  char location = identifyStartingPosition();
   Serial.print("Doing sequence #");
   Serial.println(location);
   switch(location){
-    case 1:             //left robot: 7,1,13,4,6
+    case '0':             //left robot: 7,1,13,4,6
      //ball 7
       UCmove(10);
       doubleBlink();
 
       //ball 1
+      stopped();
+      delay(200);
       pivot('L',90);
       UCmove(2);
+      stopped();
+      delay(200);
       pivot('R',90);
       
       //ball 13
       UCmove(3);
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(6);
+      stopped();
+      delay(200);
       pivot('L',90);
 
       //ball 4
       UCmove(6);
+      stopped();
+      delay(200);
       pivot('L',90);
       UCmove(2);
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(4);
 
       //ball 6
+      stopped();
+      delay(200);
       pivot('L',90);
       UCmove(1);
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(8);
+      stopped();
+      delay(200);
       pivot('L',90);
       UCmove(1);
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(1);        //ends on the first intersection
-      stopped();
-      delay(1000000);   //just stop
+      party();
       break;  
-    case 2:             //centre robot: 8,2,14,5,11
+    case '1':             //centre robot: 8,2,14,5,11
       //ball 8
       UCmove(11);
       
       //ball 2
+      stopped();
+      delay(200);
       pivot('L',90);
       UCmove(4);
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(3);
       
       //ball 14
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(4);
+      stopped();
+      delay(200);
       pivot('L',90);
       UCmove(6);
       
       //ball 5
+      stopped();
+      delay(200);
       pivot('L',90);
       UCmove(4);
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(9);
       
       //ball 11
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(4);
+      stopped();
+      delay(200);
       pivot('L',90);
       UCmove(5);
-      stopped();
-      delay(1000000);   //just stop
+      party();
       break;
-    case 3:             //right robot: 9,3,15,10,12
+    case '2':             //right robot: 9,3,15,10,12
       //ball 9
       UCmove(12);
       
       //ball 3
+      stopped();
+      delay(200);
       pivot('L',90);
-      UCmove(6);
+      UCmove(6);                          //6
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(3);
       
       //ball 15
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(2);
+      stopped();
+      delay(200);
       pivot('L',90);
       UCmove(1);
       
       //ball 10
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(1);
+      stopped();
+      delay(200);
       pivot('L',90);
       UCmove(8);
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(1);
+      stopped();
+      delay(200);
       pivot('L',90);
       UCmove(4);
       
       //ball 12
+      stopped();
+      delay(200);
       pivot('R',90);
       UCmove(2);
+      stopped();
+      delay(200);
       pivot('L',90);
       UCmove(4);
-      stopped();
-      delay(1000000);   //just stop
+      party();
       break;      
   }
   Serial.print("Finished!!!!");
@@ -234,9 +296,11 @@ void sequence(){                      //sequence based on starting position
 void grabBall(){
   stopped();
   tilt.write(46);
-  for(int i=40;i<180;i++){
-    grip.write(i);
-    delay(35);
+  for(int j=0;j<2;j++){
+    for(int i=40;i<180;i++){
+      grip.write(i);
+      delay(30);
+    }
   }
   tilt.write(170);
   delay(500);
@@ -365,15 +429,24 @@ void bluetoothEmergency(){
         delay(500);
         completion++;
         break;
-        
     }
   }
   completion = 0;
 }
+
+void party(){
+  stopped();
+  while(1){
+    for(int i=40;i<180;i++){
+      grip.write(i);
+      delay(4);
+    }
+  }
+}
   
 //----------------------------------------------SETUP
 void setup() {
-  Serial.begin(115200);       //115200 for bluetoothM
+  Serial.begin(9600);       //115200 for bluetooth
  
   IRserial.attach(9, -1);
   pinMode(Lbumper, INPUT);
@@ -392,11 +465,5 @@ void setup() {
 
 //----------------------------------------------LOOP
 void loop(){
-  /*
-  //This is the code for the competition
-  sequence();
-  while(1) Serial.println("done");
-  */
-  startingPosition = 2;
   sequence();
 }
