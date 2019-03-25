@@ -14,7 +14,6 @@ QSerial IRserial;
 #define button              8
 #define IRreciever          9
 #define LED                 10
-//#define something         11
 
 Servo tilt, grip;   //pins 12, 13
 
@@ -31,7 +30,7 @@ Servo tilt, grip;   //pins 12, 13
 byte left_speed = 109;
 byte right_speed = 110;
 char grabOrDeposit = 'G';         //global variable which charges based on if robot is grabbing/depositing
-char startingPosition = '9';
+char startingPosition = '9';      //arbitrary number
 
 //------------------------------------------------------BASIC FUNCTIONS
 void forward(){
@@ -110,7 +109,7 @@ void pivot(char direction, int degrees){            //UPDATED pivot function
 //----------------------------------------------SEQUENCES
 char identifyStartingPosition(){         //left = 1, centre = 2, right = 3
     Serial.print("Identifying starting position...");
-    while(startingPosition == '9'){                     //constantly checking for character
+    while(startingPosition == '9'){                     //constantly checking for new character
       switch(IRserial.receive(200)){
           case '0':
             Serial.println("Left");
@@ -446,7 +445,7 @@ void party(){
   
 //----------------------------------------------SETUP
 void setup() {
-  Serial.begin(9600);       //115200 for bluetooth
+  Serial.begin(9600);       //115200 for bluetooth module
  
   IRserial.attach(9, -1);
   pinMode(Lbumper, INPUT);
