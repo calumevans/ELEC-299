@@ -360,6 +360,7 @@ int followLine(){
   Serial.println(detectIntersection());
   bluetoothEmergency();
   while(!detectIntersection()){
+    //bluetoothEmergency();                                       //uncomment this line to take advantage of Bluetooth emergency
     checkWall(); 
     if(analogRead(sensorR) > RTHRESH){     //veering left
       Serial.println("veering left");
@@ -433,7 +434,7 @@ void bluetoothEmergency(){
   completion = 0;
 }
 
-void party(){
+void party(){                     //make sthe robot clap the gripper when the sequence is completed
   stopped();
   while(1){
     for(int i=40;i<180;i++){
